@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Renove suas fotos antigas de forma 100% online, pelo WhatsApp." />
+  <title>Nostalgia Serviços | Renovação de Fotos</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:opsz,wght@5..120,700;5..120,800&display=swap" rel="stylesheet" />
+  <style>
+    :root { --ink:#284b4b; --muted:#647371; --cream:#f4ecdf; --paper:#ede1cf; --peach:#e9c9a9; --coral:#c96950; --green:#497c6b; --pale:#d9e2d7; --line:rgba(40,75,75,.15); }
+    * { box-sizing:border-box; }
+    html { scroll-behavior:smooth; }
+    body { margin:0; background:var(--cream); color:var(--ink); font-family:'DM Sans',sans-serif; }
+    .shell { max-width:1120px; margin:0 auto; padding:0 28px; }
+    header { display:flex; align-items:center; justify-content:space-between; padding:24px 0; }
+    .brand { color:var(--ink); font-weight:700; text-decoration:none; display:flex; align-items:center; gap:8px; letter-spacing:-.4px; }
+    .brand-mark { width:43px; height:43px; object-fit:contain; }
+    .header-link { color:var(--ink); font-weight:600; font-size:14px; text-decoration:none; border-bottom:1px solid var(--ink); padding-bottom:2px; }
+    .hero { padding:52px 0 72px; display:grid; grid-template-columns:1.05fr .95fr; align-items:center; gap:62px; }
+    .eyebrow { display:inline-flex; align-items:center; gap:8px; color:var(--green); font-weight:700; font-size:13px; letter-spacing:.07em; text-transform:uppercase; }
+    .eyebrow::before { content:''; height:8px; width:8px; border-radius:50%; background:var(--green); }
+    h1 { font-family:'Playfair Display',serif; font-size:clamp(42px,5vw,66px); line-height:1.02; letter-spacing:-2.3px; margin:17px 0 22px; max-width:630px; }
+    h1 em { color:var(--coral); font-style:normal; }
+    .hero p { color:var(--muted); max-width:510px; line-height:1.65; font-size:18px; margin:0 0 31px; }
+    .cta { display:inline-flex; align-items:center; justify-content:center; gap:10px; padding:16px 22px; background:#25d366; color:#073d20; border-radius:9px; font-weight:700; text-decoration:none; box-shadow:0 11px 22px rgba(37,211,102,.2); transition:.2s transform,.2s box-shadow; }
+    .cta:hover { transform:translateY(-2px); box-shadow:0 14px 28px rgba(37,211,102,.29); }
+    .cta svg { width:21px; height:21px; fill:currentColor; }
+    .proof { display:flex; align-items:center; gap:10px; margin:17px 0 0; color:var(--muted); font-size:13px; }
+    .proof span { color:var(--coral); font-size:17px; letter-spacing:1px; }
+    .photo-card { position:relative; min-height:440px; background:var(--paper); border-radius:4px 42px 4px 42px; overflow:hidden; box-shadow:20px 20px 0 var(--pale); }
+    .photo-card::before { content:''; position:absolute; width:270px; height:270px; right:-93px; top:-95px; border-radius:50%; background:#d8b58f; opacity:.55; }
+    .grid-lines { position:absolute; inset:0; opacity:.15; background-image:linear-gradient(var(--ink) 1px,transparent 1px),linear-gradient(90deg,var(--ink) 1px,transparent 1px); background-size:26px 26px; }
+    .old-photo,.new-photo { position:absolute; width:58%; aspect-ratio:1/.84; padding:10px 10px 31px; background:#d6c3a8; box-shadow:0 12px 21px rgba(40,75,75,.18); }
+    .old-photo { left:8%; top:18%; transform:rotate(-9deg); filter:sepia(.75) grayscale(.45); }
+    .new-photo { right:5%; bottom:12%; transform:rotate(8deg); background:#fff6e9; }
+    .old-photo::after,.new-photo::after { content:''; position:absolute; inset:10px 10px 31px; background:linear-gradient(135deg,#9e7258,#d5b18a 49%,#6e8879 50%,#b7c7ae); }
+    .old-photo::before { content:''; position:absolute; z-index:2; height:2px; width:84%; top:47%; left:8%; background:#705542; transform:rotate(9deg); box-shadow:27px -48px 0 -1px #705542, -8px 48px 0 -1px #705542; }
+    .new-photo::before { content:'✦'; position:absolute; z-index:3; top:-27px; right:-11px; color:var(--coral); font-size:55px; line-height:1; }
+    .restore-arrow { position:absolute; z-index:4; top:44%; left:40%; display:grid; place-items:center; width:68px; height:68px; border-radius:50%; background:var(--coral); color:var(--cream); font-size:33px; box-shadow:0 5px 13px rgba(40,75,75,.22); transform:rotate(-9deg); }
+    .memory-label { position:absolute; z-index:5; bottom:24px; left:22px; background:#f8efdf; padding:11px 14px; border-radius:3px; font-family:'Playfair Display',serif; font-size:17px; transform:rotate(-3deg); box-shadow:0 5px 14px rgba(24,51,58,.12); }
+    .stamp { position:absolute; z-index:5; top:24px; right:22px; width:94px; height:94px; border:2px solid var(--ink); color:var(--ink); border-radius:50%; display:grid; place-items:center; text-align:center; font-size:11px; font-weight:700; line-height:1.25; transform:rotate(14deg); }
+    .stamp span { display:block; font-family:'Playfair Display',serif; font-size:23px; line-height:.7; }
+    .how { background:var(--ink); color:var(--cream); padding:78px 0; }
+    .section-kicker { color:var(--peach); font-size:13px; font-weight:700; text-transform:uppercase; letter-spacing:.08em; }
+    h2 { font-family:'Playfair Display',serif; font-size:clamp(32px,4vw,46px); letter-spacing:-1.5px; line-height:1.12; margin:11px 0 42px; }
+    .steps { display:grid; grid-template-columns:repeat(3,1fr); gap:24px; }
+    .step { border-top:1px solid rgba(255,250,242,.3); padding-top:21px; }
+    .step-num { color:var(--peach); font-family:'Playfair Display',serif; font-size:27px; }
+    .step h3 { margin:17px 0 8px; font-size:19px; }
+    .step p { margin:0; max-width:280px; color:#c8d4d1; line-height:1.55; font-size:15px; }
+    .why { padding:80px 0; display:grid; grid-template-columns:.85fr 1.15fr; gap:70px; align-items:start; }
+    .why h2 { margin-bottom:0; }
+    .benefits { display:grid; grid-template-columns:1fr 1fr; gap:18px; }
+    .benefit { padding:22px; border:1px solid var(--line); border-radius:12px; background:#eee4d4; }
+    .benefit-icon { font-size:27px; line-height:1; }
+    .benefit h3 { margin:13px 0 6px; font-size:16px; }
+    .benefit p { color:var(--muted); font-size:14px; line-height:1.5; margin:0; }
+    .final { margin:0 0 50px; padding:57px 40px; border-radius:14px; color:var(--cream); text-align:center; background:linear-gradient(115deg,#376f62,#1f4b50); }
+    .final h2 { margin:0 auto 13px; max-width:650px; }
+    .final p { color:#dbe8e2; margin:0 auto 27px; max-width:510px; line-height:1.55; }
+    .final .cta { background:var(--peach); color:var(--ink); box-shadow:none; }
+    footer { border-top:1px solid var(--line); padding:22px 0 28px; color:var(--muted); font-size:13px; display:flex; justify-content:space-between; gap:20px; }
+    @media (max-width:760px) { .shell{padding:0 20px} .header-link{display:none} .hero{grid-template-columns:1fr; padding:35px 0 57px; gap:43px} .photo-card{min-height:350px; margin-right:13px} h1{letter-spacing:-1.6px}.steps,.why{grid-template-columns:1fr}.steps{gap:32px}.why{gap:31px;padding:59px 0}.benefits{gap:12px}.benefit{padding:17px}.final{padding:43px 22px;margin-bottom:33px} footer{flex-direction:column;gap:5px} }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="shell">
+      <header>
+        <a class="brand" href="#inicio"><img class="brand-mark" src="assets/nostalgia-logo.png" alt="Logo Nostalgia Serviços" /> Nostalgia Serviços</a>
+        <a class="header-link" href="#como-funciona">Como funciona</a>
+      </header>
+      <section class="hero" id="inicio">
+        <div>
+          <span class="eyebrow">Renovação de fotos online</span>
+          <h1>Suas memórias merecem <em>voltar à vida.</em></h1>
+          <p>Envie aquela foto antiga, desgastada ou sem cor pelo WhatsApp. Nós cuidamos da renovação com carinho — sem você sair de casa.</p>
+          <a class="cta" target="_blank" rel="noopener" href="https://wa.me/5527981367114?text=Ol%C3%A1!%20Quero%20renovar%20uma%20foto.">
+            <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3a13 13 0 0 0-11.08 19.8L3 29l6.36-1.82A13 13 0 1 0 16 3Zm0 23.65c-2.1 0-4.16-.57-5.95-1.64l-.43-.25-3.77 1.08 1.1-3.67-.28-.46A10.65 10.65 0 1 1 16 26.65Zm5.84-7.98c-.32-.16-1.9-.94-2.2-1.05-.3-.1-.52-.16-.74.16-.22.32-.85 1.05-1.04 1.27-.2.21-.4.24-.72.08-1.94-.97-3.21-1.73-4.5-3.93-.34-.58.34-.54.97-1.8.1-.22.05-.4-.03-.56-.08-.16-.74-1.78-1.01-2.44-.27-.65-.54-.56-.74-.57h-.63c-.22 0-.57.08-.87.4-.3.32-1.14 1.12-1.14 2.72s1.17 3.15 1.33 3.37c.16.21 2.3 3.51 5.56 4.92.77.33 1.38.53 1.85.67.78.25 1.49.21 2.05.13.63-.1 1.9-.78 2.17-1.54.27-.75.27-1.4.19-1.54-.08-.13-.3-.21-.62-.37Z"/></svg>
+            Enviar minha foto agora
+          </a>
+          <div class="proof"><span>★★★★★</span> Atendimento pessoal, simples e pelo WhatsApp</div>
+        </div>
+        <div class="photo-card" role="img" aria-label="Representação de uma foto antiga sendo renovada">
+          <div class="grid-lines"></div><div class="old-photo"></div><div class="new-photo"></div><div class="restore-arrow">→</div><div class="stamp"><span>100%</span>ONLINE<br>COM CARINHO</div><div class="memory-label">Do tempo para sempre ✦</div>
+        </div>
+      </section>
+    </div>
+    <section class="how" id="como-funciona"><div class="shell">
+      <div class="section-kicker">É simples assim</div><h2>Renove sua foto em três passos.</h2>
+      <div class="steps"><article class="step"><div class="step-num">01</div><h3>Envie sua foto</h3><p>Chame no WhatsApp e mande uma foto da imagem que deseja renovar.</p></article><article class="step"><div class="step-num">02</div><h3>Conte sua ideia</h3><p>Nos diga o que você gostaria de melhorar: cor, qualidade, riscos ou detalhes.</p></article><article class="step"><div class="step-num">03</div><h3>Receba renovada</h3><p>Você recebe sua memória renovada digitalmente, pronta para guardar ou compartilhar.</p></article></div>
+    </div></section>
+    <section class="shell why"><div><div class="section-kicker">Cuidado em cada detalhe</div><h2>Uma nova vida para fotos que contam a sua história.</h2></div><div class="benefits"><article class="benefit"><div class="benefit-icon">✦</div><h3>100% online</h3><p>Todo o atendimento acontece pelo WhatsApp, onde você estiver.</p></article><article class="benefit"><div class="benefit-icon">♡</div><h3>Feito com carinho</h3><p>Tratamos cada fotografia com o respeito que uma memória merece.</p></article><article class="benefit"><div class="benefit-icon">◌</div><h3>Fácil de enviar</h3><p>Basta fotografar ou encaminhar o arquivo que você já tem.</p></article><article class="benefit"><div class="benefit-icon">↗</div><h3>Pronta para compartilhar</h3><p>Receba a versão digital para enviar, imprimir e reviver.</p></article></div></section>
+    <div class="shell"><section class="final"><div class="section-kicker">Sua memória começa aqui</div><h2>Tem uma foto especial esperando para ser renovada?</h2><p>Fale com a gente agora. É rápido, fácil e totalmente online.</p><a class="cta" target="_blank" rel="noopener" href="https://wa.me/5527981367114?text=Ol%C3%A1!%20Quero%20renovar%20uma%20foto.">Chamar no WhatsApp</a></section><footer><span>© 2026 Nostalgia Serviços</span><span>Renovando memórias, preservando histórias.</span></footer></div>
+  </main>
+</body>
+</html>
