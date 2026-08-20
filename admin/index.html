@@ -129,5 +129,35 @@
     }
   }, true);
 </script>
+<script>
+  /* Permite descartar uma revisão também pelo painel do celular. */
+  function addReviewDiscardButtons() {
+    document.querySelectorAll('[data-review]').forEach(card => {
+      if (card.querySelector('[data-discard-review]')) return;
+      const button = document.createElement('button');
+      button.className = 'button danger';
+      button.type = 'button';
+      button.dataset.discardReview = '1';
+      button.textContent = 'Apagar da revisão';
+      card.append(button);
+    });
+  }
+  const reviewList = document.getElementById('review-list');
+  if (reviewList) new MutationObserver(addReviewDiscardButtons).observe(reviewList, { childList: true, subtree: true });
+  document.addEventListener('click', async event => {
+    const button = event.target.closest('[data-discard-review]');
+    if (!button) return;
+    event.preventDefault();
+    const card = button.closest('[data-review]');
+    button.disabled = true;
+    try {
+      await request('/admin-api/reviews/discard', { method: 'POST', body: JSON.stringify({ id: card.dataset.review }) });
+      button.textContent = 'Remoção enviada ao PC';
+    } catch (err) {
+      alert(err.message);
+      button.disabled = false;
+    }
+  }, true);
+</script>
 </body>
 </html>
