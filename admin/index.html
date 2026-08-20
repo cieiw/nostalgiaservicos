@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
   <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=0.5, maximum-scale=5, user-scalable=yes, viewport-fit=cover">
   <meta name="robots" content="noindex,nofollow">
   <title>Nostalgia · Painel</title>
   <style>
@@ -12,9 +12,14 @@
 <style>
   /* Evita que navegadores móveis ampliem automaticamente campos e páginas largas. */
   @media (max-width: 800px) {
-    html, body { width: 100%; max-width: 100%; overflow-x: hidden; }
-    .content, .top, .grid, .box, .chat, .compose { min-width: 0; }
+    .content, .top, .grid, .box, .chat, .compose { min-width: 0; max-width: 100%; }
     .top { flex-wrap: wrap; }
+    .content { padding-left: 11px; padding-right: 11px; }
+    .review-original { width: 100%; }
+    .review .photos, .review-options .photos { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .aspect-picker label { font-size: 12px; padding: 5px 6px; }
+    /* 16px evita zoom automático ao focar campos no iPhone, mas o gesto
+       de pinça continua liberado pelo viewport acima. */
     input, textarea, select { font-size: 16px !important; }
   }
   /* A proporção também vale para uma edição, não apenas para refazer. */
