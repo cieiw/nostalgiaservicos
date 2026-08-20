@@ -25,6 +25,45 @@
   /* A proporção também vale para uma edição, não apenas para refazer. */
   .review .aspect-picker.hide { display: flex !important; }
   .review .aspect-picker::before { content: "Proporção da nova geração (editar ou refazer):"; width: 100%; color: #c9d7f0; font-size: 12px; font-weight: 700; }
+  @media (max-width: 600px) {
+    body { font-size: 13px; overflow-x: hidden; }
+    .side { padding: 10px 8px; }
+    .brand { font-size: 16px; padding-bottom: 8px; }
+    .brand img { width: 28px; height: 28px; }
+    .nav { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; overflow: visible; }
+    .nav button { width: 100%; min-width: 0; justify-content: center; padding: 9px 5px; font-size: 11px; white-space: normal; text-align: center; }
+    .content { padding: 14px 9px 28px; }
+    .top { gap: 8px; margin-bottom: 14px; }
+    .top h1 { font-size: 19px; }
+    .top p { font-size: 12px; }
+    .online { font-size: 9px; padding: 6px 8px; }
+    .cards { gap: 10px; margin-bottom: 14px; }
+    .card { padding: 14px; }
+    .card strong { font-size: 25px; }
+    .toolbar { gap: 7px; margin-bottom: 12px; }
+    .toolbar .button { flex: 1 1 135px; padding: 10px 8px; }
+    .box h2 { padding: 13px; font-size: 13px; }
+    .item { padding: 11px; }
+    .chat { height: calc(100vh - 210px); min-height: 360px; }
+    .messages { padding: 11px; }
+    .compose { padding: 8px; }
+    .bubble { max-width: 88%; }
+    .bubble.media { width: min(195px, 78%); }
+    .review { padding: 10px; }
+    .review h3 { overflow-wrap: anywhere; }
+    .review-original { margin-bottom: 10px; }
+    .review-options { padding-top: 10px; }
+    .review-options .photos { gap: 5px; }
+    .review label span { display: flex; align-items: center; font-size: 12px; }
+    .review input { margin: 6px; }
+    .aspect-picker { gap: 5px; }
+    .aspect-picker label { gap: 4px; font-size: 11px; }
+    .ratio-16-9 { width: 23px; height: 13px; }
+    .ratio-4-3 { width: 20px; height: 15px; }
+    .ratio-1-1 { width: 16px; height: 16px; }
+    .ratio-3-4 { width: 15px; height: 20px; }
+    .ratio-9-16 { width: 13px; height: 23px; }
+  }
 </style>
 </head>
 <body>
