@@ -124,6 +124,17 @@
   }, true);
 
   const pendingEditReviews = new Map();
+  function addVersionNavigation() {
+    document.querySelectorAll('[data-review]').forEach(card => {
+      const select = card.querySelector('[data-base]');
+      if (!select || card.querySelector('[data-version-navigation]')) return;
+      const navigation = document.createElement('div');
+      navigation.dataset.versionNavigation = '1';
+      navigation.style.cssText = 'display:flex;align-items:center;gap:8px;margin:8px 0 2px';
+      navigation.innerHTML = '<button type="button" class="button secondary" data-version-step="-1" aria-label="Ver geração anterior">←</button><span class="sub" style="flex:1">Navegue entre as gerações</span><button type="button" class="button secondary" data-version-step="1" aria-label="Ver próxima geração">→</button>';
+      select.before(navigation);
+    });
+  }
   function applyPendingReviewStatus() {
     document.querySelectorAll('[data-review]').forEach(card => {
       const id = card.dataset.review;
@@ -150,6 +161,7 @@
     document.querySelectorAll('[data-edit]').forEach(item => {
       if (!item.closest('[data-review]')?.dataset.editPrompt) item.textContent = 'Preparar edição';
     });
+    addVersionNavigation();
     const list = document.getElementById('review-list');
     if (!list || document.getElementById('finish-reviews-bottom')) return;
     const bottom = document.createElement('button');
@@ -163,6 +175,17 @@
   finishReviewButtons();
   const reviewWatcher = document.getElementById('review-list');
   if (reviewWatcher) new MutationObserver(() => { finishReviewButtons(); applyPendingReviewStatus(); }).observe(reviewWatcher, { childList: true, subtree: true });
+  document.addEventListener('click', event => {
+    const button = event.target.closest('[data-version-step]');
+    if (!button) return;
+    const card = button.closest('[data-review]');
+    const select = card?.querySelector('[data-base]');
+    if (!select) return;
+    const next = Math.max(0, Math.min(select.options.length - 1, select.selectedIndex + Number(button.dataset.versionStep)));
+    if (next === select.selectedIndex) return;
+    select.selectedIndex = next;
+    select.dispatchEvent(new Event('change', { bubbles: true }));
+  });
   document.addEventListener('click', async event => {
     const button = event.target.closest('[data-finish-review]');
     if (!button) return;
