@@ -105,8 +105,8 @@
     async function sendCommand(button){const original=button.textContent;button.disabled=true;button.textContent='Enviando…';try{await request('/admin-api/commands',{method:'POST',body:JSON.stringify({action:button.dataset.command})});button.textContent='Aguardando PC…';setTimeout(load,1200)}catch(err){alert(err.message);button.textContent=original}finally{setTimeout(()=>{button.disabled=false;load()},2500)}}document.querySelectorAll('[data-command]').forEach(b=>b.onclick=()=>sendCommand(b));$('#toggle-generation').onclick=()=>sendCommand($('#toggle-generation'));$('#refresh-orders').onclick=load;if(token)show();
   </script>
 <script>
-  /* A interface antiga enviava a edição sem a proporção escolhida. Este
-     listener captura o clique antes dela e inclui a proporção no comando. */
+  /* Preparar edição não envia nada ao PC: ela entra no mesmo lote que as
+     demais escolhas quando a revisão for finalizada. */
   document.addEventListener('click', async event => {
     const button = event.target.closest('[data-edit]');
     if (!button) return;
@@ -117,15 +117,74 @@
     const baseVersionId = card?.querySelector('[data-base]')?.value;
     const aspectRatio = card?.querySelector('[data-aspect] input:checked')?.value || '1_1';
     if (!prompt) return alert('Escreva o prompt da edição.');
-    button.disabled = true;
+    card.dataset.editPrompt = prompt;
+    card.dataset.editBaseVersionId = baseVersionId;
+    card.dataset.editAspectRatio = aspectRatio;
+    button.textContent = 'Edição preparada';
+  }, true);
+
+  const pendingEditReviews = new Map();
+  function applyPendingReviewStatus() {
+    document.querySelectorAll('[data-review]').forEach(card => {
+      const id = card.dataset.review;
+      const remote = (reviews || []).find(item => String(item.item_id) === String(id));
+      const pending = pendingEditReviews.get(id);
+      if (pending && Number(remote?.candidates || 0) === 0) pending.resetSeen = true;
+      if (pending?.resetSeen && Number(remote?.candidates || 0) > 0) pendingEditReviews.delete(id);
+      let status = card.querySelector('[data-processing-status]');
+      if (!pendingEditReviews.has(id)) { status?.remove(); return; }
+      if (!status) {
+        status = document.createElement('p');
+        status.dataset.processingStatus = '1';
+        status.className = 'sub';
+        status.style.cssText = 'margin:10px 0;color:#ffd766;font-weight:700';
+        card.querySelector('h3')?.after(status);
+      }
+      status.textContent = 'Edição enviada. Aguardando processamento e novas opções…';
+      card.querySelectorAll('button, textarea, select, input').forEach(control => control.disabled = true);
+    });
+  }
+  function finishReviewButtons() {
+    const top = document.getElementById('finish-reviews');
+    if (top) top.dataset.finishReview = '1';
+    document.querySelectorAll('[data-edit]').forEach(item => {
+      if (!item.closest('[data-review]')?.dataset.editPrompt) item.textContent = 'Preparar edição';
+    });
+    const list = document.getElementById('review-list');
+    if (!list || document.getElementById('finish-reviews-bottom')) return;
+    const bottom = document.createElement('button');
+    bottom.id = 'finish-reviews-bottom';
+    bottom.className = 'button';
+    bottom.dataset.finishReview = '1';
+    bottom.textContent = 'Finalizar escolhas';
+    bottom.style.cssText = 'display:block;width:100%;margin:18px 0 5px';
+    list.after(bottom);
+  }
+  finishReviewButtons();
+  const reviewWatcher = document.getElementById('review-list');
+  if (reviewWatcher) new MutationObserver(() => { finishReviewButtons(); applyPendingReviewStatus(); }).observe(reviewWatcher, { childList: true, subtree: true });
+  document.addEventListener('click', async event => {
+    const button = event.target.closest('[data-finish-review]');
+    if (!button) return;
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    const decisions = [...document.querySelectorAll('[data-review]')].map(card => ({
+      id: card.dataset.review,
+      selected: Number(card.querySelector('input[name^=review-]:checked')?.value || 0),
+      aspect_ratio: card.dataset.editAspectRatio || card.querySelector('[data-aspect] input:checked')?.value || '1_1',
+      edit_prompt: card.dataset.editPrompt || '',
+      base_version_id: card.dataset.editBaseVersionId || ''
+    }));
+    if (!decisions.length) return;
+    document.querySelectorAll('[data-finish-review]').forEach(item => { item.disabled = true; item.textContent = 'Enviando escolhas…'; });
     try {
-      await request('/admin-api/reviews/edit', { method: 'POST', body: JSON.stringify({ id: card.dataset.review, base_version_id: baseVersionId, prompt, aspect_ratio: aspectRatio }) });
-      button.textContent = 'Edição enviada ao PC';
-      setTimeout(loadReviews, 3000);
+      await request('/admin-api/reviews/finalize', { method: 'POST', body: JSON.stringify({ decisions }) });
+      decisions.filter(item => item.edit_prompt).forEach(item => pendingEditReviews.set(item.id, { resetSeen: false }));
+      applyPendingReviewStatus();
+      document.querySelectorAll('[data-finish-review]').forEach(item => item.textContent = 'Escolhas enviadas · aguardando PC');
     } catch (err) {
       alert(err.message);
-    } finally {
-      button.disabled = false;
+      document.querySelectorAll('[data-finish-review]').forEach(item => { item.disabled = false; item.textContent = 'Finalizar escolhas'; });
     }
   }, true);
 </script>
