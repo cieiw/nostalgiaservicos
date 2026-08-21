@@ -280,6 +280,25 @@
         }
         return { ...data, clients };
       }
+      if (path === '/admin-api/activity' && Array.isArray(data.events)) {
+        return {
+          ...data,
+          events: data.events.slice(0, 30).map(event => ({
+            ...event,
+            // Um erro pode conter a resposta inteira de uma API. Isso jamais
+            // pode deixar um registro pesado o bastante para travar a tela.
+            text: String(event.text || '').slice(0, 700)
+          }))
+        };
+      }
+      if (path === '/admin-api/overview') {
+        return {
+          ...data,
+          orders: Array.isArray(data.orders) ? data.orders.slice(0, 30) : [],
+          conversations: Array.isArray(data.conversations) ? data.conversations.slice(0, 30) : [],
+          commands: Array.isArray(data.commands) ? data.commands.slice(0, 10) : []
+        };
+      }
       return data;
     };
 
@@ -325,6 +344,7 @@
         const nextView = button.dataset.view;
         if (nextView === activeView) return refreshActiveView();
         window.nostalgiaStopQueuedImages?.();
+        releaseInactiveImages();
         document.querySelectorAll('[data-view]').forEach(item => item.classList.remove('active'));
         document.querySelectorAll('.view').forEach(item => item.classList.remove('active'));
         button.classList.add('active');
@@ -335,21 +355,16 @@
       };
     });
 
-    const observer = new MutationObserver(records => {
-      for (const record of records) {
-        for (const node of record.removedNodes) {
-          if (node.nodeType !== Node.ELEMENT_NODE) continue;
-          const images = [node, ...node.querySelectorAll?.('img') || []];
-          for (const image of images) {
-            if (image.tagName === 'IMG' && image.src.startsWith('blob:')) {
-              URL.revokeObjectURL(image.src);
-            }
-            imageObserver?.unobserve?.(image);
-          }
-        }
-      }
-    });
-    observer.observe(document.body, { childList: true, subtree: true });
+    // Antes havia um observador no documento inteiro. Ele varria nós a cada
+    // pequena alteração visual; a limpeza agora roda somente ao sair da guia.
+    const releaseInactiveImages = () => {
+      document.querySelectorAll('.view:not(.active) img[src^="blob:"]').forEach(image => {
+        imageObserver?.unobserve?.(image);
+        URL.revokeObjectURL(image.src);
+        image.removeAttribute('src');
+        image.dataset.loaded = '';
+      });
+    };
   })();
 </script>
 <script>
