@@ -200,6 +200,53 @@
     async function sendCommand(button){const original=button.textContent;button.disabled=true;button.textContent='Enviando…';try{await request('/admin-api/commands',{method:'POST',body:JSON.stringify({action:button.dataset.command})});button.textContent='Aguardando PC…';setTimeout(load,1200)}catch(err){alert(err.message);button.textContent=original}finally{setTimeout(()=>{button.disabled=false;load()},2500)}}document.querySelectorAll('[data-command]').forEach(b=>b.onclick=()=>sendCommand(b));$('#toggle-generation').onclick=()=>sendCommand($('#toggle-generation'));$('#refresh-orders').onclick=load;if(token)show();
   </script>
 <script>
+  /*
+   * A revisão pode conter resíduos de tentativas antigas. Antes, a abertura da
+   * aba buscava e decodificava a imagem-base de todos eles de uma vez. Isso
+   * bloqueava a interface. Prévia de versão agora só baixa quando o operador
+   * realmente troca a versão no seletor; os demais downloads seguem uma fila
+   * curta para manter o navegador responsivo.
+   */
+  (() => {
+    const originalImageUrl = imageUrl;
+    const requestedVersions = new Set();
+    const waitingImages = [];
+    let activeImages = 0;
+    const MAX_PARALLEL_IMAGES = 3;
+
+    const runNextImage = () => {
+      while (activeImages < MAX_PARALLEL_IMAGES && waitingImages.length) {
+        const next = waitingImages.shift();
+        activeImages += 1;
+        originalImageUrl(next.path)
+          .then(next.resolve, next.reject)
+          .finally(() => {
+            activeImages -= 1;
+            runNextImage();
+          });
+      }
+    };
+
+    imageUrl = (path) => {
+      const isVersion = /\/admin-api\/reviews\/[^/]+\/version\//.test(path);
+      if (isVersion && !requestedVersions.has(path)) {
+        return Promise.reject(new Error('Prévia de versão adiada'));
+      }
+      return new Promise((resolve, reject) => {
+        waitingImages.push({ path, resolve, reject });
+        runNextImage();
+      });
+    };
+
+    document.addEventListener('change', (event) => {
+      const select = event.target.closest('[data-base]');
+      const card = select?.closest('[data-review]');
+      if (!select?.value || !card?.dataset.review) return;
+      requestedVersions.add(`/admin-api/reviews/${encodeURIComponent(card.dataset.review)}/version/${encodeURIComponent(select.value)}`);
+    }, true);
+  })();
+</script>
+<script>
   /* Preparar edição não envia nada ao PC: ela entra no mesmo lote que as
      demais escolhas quando a revisão for finalizada. */
   document.addEventListener('click', async event => {
