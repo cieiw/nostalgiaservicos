@@ -238,6 +238,14 @@
       });
     };
 
+    // Ao sair de Fotos recebidas/Revisão, não faz sentido continuar baixando
+    // dezenas de miniaturas que já ficaram invisíveis. Além de economizar a
+    // rede, isso evita que a decodificação dessas imagens congele outra guia.
+    window.nostalgiaStopQueuedImages = () => {
+      const pending = waitingImages.splice(0, waitingImages.length);
+      pending.forEach(item => item.reject(new Error('Imagem não é mais necessária nesta guia')));
+    };
+
     document.addEventListener('change', (event) => {
       const select = event.target.closest('[data-base]');
       const card = select?.closest('[data-review]');
@@ -306,8 +314,26 @@
 
     if (refreshTimer) {
       clearInterval(refreshTimer);
-      refreshTimer = setInterval(() => refreshActiveView(), 5000);
+      refreshTimer = setInterval(() => refreshActiveView(), 7000);
     }
+
+    // Substitui o manipulador antigo, que começava leituras concorrentes na
+    // troca de guia. A troca agora descarta miniaturas invisíveis e inicia uma
+    // única atualização da guia escolhida no próximo frame do navegador.
+    document.querySelectorAll('[data-view]').forEach(button => {
+      button.onclick = () => {
+        const nextView = button.dataset.view;
+        if (nextView === activeView) return refreshActiveView();
+        window.nostalgiaStopQueuedImages?.();
+        document.querySelectorAll('[data-view]').forEach(item => item.classList.remove('active'));
+        document.querySelectorAll('.view').forEach(item => item.classList.remove('active'));
+        button.classList.add('active');
+        $('#'+nextView).classList.add('active');
+        activeView = nextView;
+        $('#title').textContent = button.textContent.trim().replace(/^[^\wÀ-ÿ]+\s*/, '');
+        requestAnimationFrame(() => refreshActiveView());
+      };
+    });
 
     const observer = new MutationObserver(records => {
       for (const record of records) {
