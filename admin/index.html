@@ -4,6 +4,9 @@
   <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=0.5, maximum-scale=5, user-scalable=yes, viewport-fit=cover">
   <meta name="robots" content="noindex,nofollow">
+  <meta name="theme-color" content="#0d0f13">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="apple-touch-icon" href="../assets/nostalgia-logo.png">
   <title>Nostalgia · Painel</title>
   <style>
     :root{--bg:#0d0f13;--panel:#171a20;--panel2:#1e222b;--line:#2b303b;--text:#f5f5f4;--muted:#9aa3b2;--gold:#efbc29;--green:#4cc38a;--red:#ed6d70;--blue:#79a9ff}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:14px Inter,Segoe UI,Arial,sans-serif}.app{min-height:100vh;display:grid;grid-template-columns:242px 1fr}.side{background:#11141a;border-right:1px solid var(--line);padding:22px 13px;position:sticky;top:0;height:100vh}.brand{display:flex;align-items:center;gap:10px;padding:4px 10px 24px;font-size:17px;font-weight:800}.brand img{width:34px;height:34px;object-fit:contain}.brand span{color:var(--gold)}.nav-title{padding:13px 10px 7px;color:#667084;text-transform:uppercase;font-size:10px;font-weight:800;letter-spacing:.11em}.nav button{display:flex;gap:11px;align-items:center;width:100%;color:#c8cfda;background:none;border:0;padding:12px 11px;border-radius:8px;text-align:left;font:inherit;cursor:pointer}.nav button:hover,.nav button.active{background:#242938;color:#fff}.bottom{position:absolute;bottom:20px;left:13px;right:13px}.content{min-width:0;padding:29px clamp(19px,4vw,55px)}.top{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;margin-bottom:26px}.top h1{font-size:25px;margin:0 0 6px}.top p{margin:0;color:var(--muted)}.online{font-size:12px;border:1px solid #315b48;background:#123426;color:#91e4b9;padding:8px 11px;border-radius:99px;white-space:nowrap}.offline{border-color:#623235;background:#3b181b;color:#ffadb0}.view{display:none}.view.active{display:block}.cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:15px;margin-bottom:25px}.card,.box{background:var(--panel);border:1px solid var(--line);border-radius:12px}.card{padding:19px}.card span{display:block;color:var(--muted);font-size:12px}.card strong{display:block;font-size:30px;margin:7px 0}.card small{color:#788397}.grid{display:grid;grid-template-columns:1.1fr .9fr;gap:17px}.box{overflow:hidden}.box h2{font-size:14px;margin:0;padding:16px 18px;border-bottom:1px solid var(--line)}.list{max-height:420px;overflow:auto}.item{padding:13px 17px;border-bottom:1px solid #272c35;display:flex;gap:12px;align-items:center}.item:last-child{border-bottom:0}.avatar{width:33px;height:33px;border-radius:50%;display:grid;place-items:center;background:#303747;color:#d9e4ff;font-weight:800;flex:none}.grow{min-width:0;flex:1}.name{font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.sub{color:var(--muted);font-size:12px;margin-top:3px}.status{font-size:11px;padding:5px 7px;border-radius:99px;background:#2a303c;color:#c1c9d8;white-space:nowrap}.status.received,.status.pronto_processar{background:#463910;color:#ffd766}.status.claimed,.status.em_producao{background:#15354b;color:#92caff}.status.entregue{background:#143727;color:#9be3b9}.button{border:0;border-radius:8px;background:var(--gold);color:#211b09;padding:10px 14px;font:700 13px inherit;cursor:pointer}.button:hover{filter:brightness(1.08)}.button.secondary{background:#2a303c;color:#eef2f7}.button.danger{background:#5c2529;color:#ffd8d9}.toolbar{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:17px}.empty{color:var(--muted);padding:30px 18px;text-align:center}.chat{height:520px;display:flex;flex-direction:column}.chat-header{padding:16px 18px;border-bottom:1px solid var(--line);font-weight:700}.messages{padding:17px;overflow:auto;display:flex;flex-direction:column;gap:10px;flex:1}.media-gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;padding:11px;border-bottom:1px solid var(--line)}.media-gallery img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:7px;background:#10131a}.bubble{max-width:78%;border-radius:11px;padding:10px 12px;line-height:1.4;background:#272d38}.bubble.outgoing{align-self:flex-end;background:#1e5440}.bubble small{display:block;color:#bfd4c9;font-size:10px;margin-top:5px}.compose{display:flex;gap:8px;border-top:1px solid var(--line);padding:11px}.compose textarea{min-height:42px;max-height:110px;resize:vertical;flex:1;border:1px solid #394151;border-radius:8px;background:#10131a;color:#fff;padding:10px;font:inherit}.conversation-list{max-height:520px;overflow:auto}.conversation{width:100%;border:0;border-bottom:1px solid #272c35;background:none;color:var(--text);padding:14px 16px;text-align:left;cursor:pointer}.conversation:hover,.conversation.active{background:#222835}.command{padding:12px 15px;border-bottom:1px solid #272c35}.command b{display:block}.command small{color:var(--muted)}.reviews{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:15px}.review{padding:13px}.review h3{margin:0 0 10px;font-size:14px}.review .photos{display:grid;grid-template-columns:repeat(2,1fr);gap:7px}.review label{display:block;border:2px solid transparent;border-radius:8px;overflow:hidden;background:#222833;cursor:pointer}.review label:has(input:checked){border-color:var(--gold)}.review img{width:100%;aspect-ratio:1;object-fit:cover;display:block;background:#0f1116}.review input{margin:8px}.review select{width:100%;margin:11px 0;background:#10131a;color:#fff;border:1px solid #394151;padding:9px;border-radius:7px}.login{min-height:100vh;display:grid;place-items:center;padding:20px}.login-card{width:min(390px,100%);padding:30px;background:var(--panel);border:1px solid var(--line);border-radius:16px}.login-card img{width:52px;height:52px;object-fit:contain}.login-card h1{margin:16px 0 7px}.login-card p{color:var(--muted);line-height:1.5}.login-card input{width:100%;padding:12px;border-radius:8px;background:#10131a;border:1px solid #394151;color:#fff;margin:13px 0}.error{color:#ff9e9e;min-height:18px;font-size:12px}.hide{display:none!important}@media(max-width:800px){.app{grid-template-columns:1fr}.side{height:auto;position:static;padding:12px;border-right:0;border-bottom:1px solid var(--line)}.brand{padding:3px 8px 10px}.nav{display:flex;overflow:auto;gap:3px}.nav-title{display:none}.nav button{width:auto;white-space:nowrap;padding:10px}.bottom{display:none}.content{padding:18px 13px 35px}.cards,.grid{grid-template-columns:1fr}.top{margin-bottom:20px}.top h1{font-size:21px}.online{font-size:10px;padding:7px}.chat{height:calc(100vh - 190px);min-height:430px}.media-gallery{grid-template-columns:repeat(4,1fr)}.reviews{grid-template-columns:1fr}.review .photos{grid-template-columns:repeat(2,1fr)}}
@@ -65,14 +68,86 @@
     .ratio-9-16 { width: 13px; height: 23px; }
   }
 </style>
+<style>
+  /* Painel mobile-first: a navegação fica sempre no alcance do polegar e a
+     área útil pertence ao conteúdo, não a uma barra lateral de desktop. */
+  #install-app { display:none; }
+  #chat-back { display:none; }
+  @media (max-width: 780px) {
+    body { min-height:100dvh; background:#0b0d11; }
+    .app { display:block; min-height:100dvh; }
+    .side { position:fixed; z-index:30; inset:auto 0 0; height:72px; padding:6px 6px calc(6px + env(safe-area-inset-bottom)); background:#12161eF8; border:0; border-top:1px solid #303746; backdrop-filter:blur(14px); }
+    .brand, .nav-title, .bottom { display:none!important; }
+    .nav { display:grid!important; grid-template-columns:repeat(7,minmax(0,1fr)); gap:2px; height:100%; overflow:visible; }
+    .nav button { display:block; min-width:0; padding:7px 1px 5px; border-radius:9px; font-size:9px; line-height:1.1; color:#aab4c5; text-align:center; }
+    .nav button.active { color:#ffe18a; background:#3c3212; }
+    .content { padding:12px 10px calc(88px + env(safe-area-inset-bottom)); }
+    .top { position:sticky; z-index:15; top:0; margin:-12px -10px 12px; padding:12px 10px 10px; background:#0b0d11eF; backdrop-filter:blur(10px); align-items:center; }
+    .top h1 { font-size:19px; margin:0; }
+    .top p { display:none; }
+    .online { max-width:108px; overflow:hidden; text-overflow:ellipsis; padding:6px 8px; }
+    #install-app { display:none; border:1px solid #6f5720; background:#2e2713; color:#ffe18a; border-radius:8px; padding:6px 8px; font:700 10px inherit; }
+    #install-app.ready { display:block; }
+    .cards { grid-template-columns:repeat(3,minmax(0,1fr)); gap:7px; margin-bottom:11px; }
+    .card { padding:11px 8px; border-radius:10px; }
+    .card span, .card small { font-size:10px; line-height:1.2; }
+    .card strong { font-size:24px; margin:5px 0; }
+    .grid { gap:11px; }
+    .box { border-radius:11px; }
+    .toolbar { position:sticky; z-index:12; top:55px; margin:0 -2px 10px; padding:5px 2px; background:#0b0d11eF; }
+    .toolbar .button { flex:1; min-height:40px; padding:9px 7px; }
+    .list, .conversation-list { max-height:none; }
+    #conversations .grid { display:block; }
+    #conversations .grid > .box:first-child { max-height:calc(100dvh - 176px); overflow:auto; }
+    #conversations .chat { display:none; height:calc(100dvh - 150px); min-height:0; position:fixed; z-index:25; inset:0 0 72px; border-radius:0; border:0; background:var(--bg); }
+    #conversations.conversation-open .grid > .box:first-child { display:none; }
+    #conversations.conversation-open .chat { display:flex; }
+    .chat-header { display:flex; align-items:center; gap:9px; padding:13px 11px; }
+    #chat-back { display:inline-block; border:0; padding:7px 8px; background:#2a303c; color:#fff; border-radius:7px; font:700 12px inherit; }
+    .messages { padding:10px; gap:8px; }
+    .bubble { max-width:84%; padding:9px 10px; font-size:13px; }
+    .bubble.media { width:min(190px,72%); }
+    .bubble.media img { max-height:185px; }
+    .compose { padding:8px; padding-bottom:max(8px, env(safe-area-inset-bottom)); }
+    .compose textarea { min-height:40px; max-height:88px; }
+    .compose .button { min-width:68px; padding:8px; }
+    .reviews { display:block; }
+    .review { padding:10px; margin-bottom:10px; }
+    .review h3 { font-size:12px; margin-bottom:8px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .review-original { width:100%; margin:0 0 8px; }
+    .review-original h4, .review-options h4 { font-size:10px; margin-bottom:5px; }
+    .review-original img { width:110px; height:110px; object-fit:contain; border-radius:8px; background:#0d1118; }
+    .review-options { padding-top:8px; }
+    .review-options .photos { grid-template-columns:repeat(4,minmax(0,1fr)); gap:5px; }
+    .review-options label { border-width:1px; border-radius:7px; }
+    .review-options img { height:104px; object-fit:contain; background:#0d1118; }
+    .review-options label span { justify-content:center; font-size:10px; padding:3px 1px; }
+    .review-options input { margin:3px; }
+    .review-options:not(:nth-of-type(2)) { display:none; }
+    .review-edit-toggle { display:block; width:100%; margin:8px 0 0; padding:9px; border:1px solid #394151; border-radius:8px; background:#202630; color:#dfe8f6; font:700 12px inherit; text-align:left; }
+    .review.editing .review-options:not(:nth-of-type(2)), .review.editing .aspect-picker, .review.editing [data-redo] { display:block; }
+    .review.editing .aspect-picker { display:flex; }
+    .review.editing .review-options [data-base-preview] { max-height:150px; }
+    .review.editing .review-options textarea { min-height:70px; }
+    .aspect-picker { display:none!important; }
+    .aspect-picker label { padding:5px; font-size:10px; }
+    .review > .button { width:100%; margin-top:8px; min-height:40px; }
+    .image-modal { padding:8px; }
+    .image-modal img { max-height:calc(100dvh - 16px); }
+  }
+  @media (max-width: 390px) {
+    .nav button { font-size:8px; }
+    .review-options img { height:88px; }
+  }
+</style>
 </head>
 <body>
   <section id="login" class="login"><form id="login-form" class="login-card"><img src="../assets/nostalgia-logo.png" alt="Nostalgia"><h1>Painel Nostalgia</h1><p>Entre para acompanhar e controlar o programa instalado no seu computador.</p><input id="password" type="password" autocomplete="current-password" placeholder="Senha do painel" required><div id="login-error" class="error"></div><button class="button" type="submit">Entrar no painel</button></form></section><div id="image-modal" class="image-modal hide" aria-hidden="true"><button type="button">Fechar</button><img alt="Visualização ampliada"></div>
   <main id="app" class="app hide">
     <aside class="side"><div class="brand"><img src="../assets/nostalgia-logo.png" alt=""><div>Nostalgia<br><span>Administração</span></div></div><nav class="nav"><div class="nav-title">Painel</div><button class="active" data-view="dashboard">▦ Visão geral</button><button data-view="conversations">◉ Conversas</button><button data-view="received">▤ Fotos recebidas</button><button data-view="reviews">▧ Revisão</button><button data-view="orders">▣ Pedidos</button><button data-view="activity">≡ Atividade</button><div class="nav-title">Controle</div><button data-view="control">◌ Geração e fila</button></nav><div class="bottom"><button id="logout" class="button secondary">Sair</button></div></aside>
-    <section class="content"><header class="top"><div><h1 id="title">Visão geral</h1><p id="subtitle">Acompanhamento do seu atendimento.</p></div><div id="connection" class="online">● Atualizando</div></header>
+    <section class="content"><header class="top"><div><h1 id="title">Visão geral</h1><p id="subtitle">Acompanhamento do seu atendimento.</p></div><button id="install-app" type="button">Instalar</button><div id="connection" class="online">● Atualizando</div></header>
       <section id="dashboard" class="view active"><div class="cards"><article class="card"><span>Pedidos aguardando</span><strong id="pending">—</strong><small>Fotos ainda no Worker</small></article><article class="card"><span>Pedidos em processamento</span><strong id="processing">—</strong><small>Fila que já chegou ao programa</small></article><article class="card"><span>Conversas recentes</span><strong id="conversation-count">—</strong><small>Clientes no atendimento</small></article></div><div class="grid"><section class="box"><h2>Pedidos recentes</h2><div id="recent-orders" class="list"></div></section><section class="box"><h2>Últimos comandos</h2><div id="commands" class="list"></div></section></div></section>
-      <section id="conversations" class="view"><div class="grid"><section class="box"><h2>Conversas</h2><div id="conversation-list" class="conversation-list"></div></section><section class="box chat"><div id="chat-title" class="chat-header">Selecione uma conversa</div><div id="messages" class="messages"><div class="empty">As mensagens do cliente e do robô aparecerão aqui.</div></div><form id="compose" class="compose"><textarea id="message-text" placeholder="Escreva uma mensagem" disabled></textarea><button id="send-message" class="button" disabled>Enviar</button></form></section></div></section>
+      <section id="conversations" class="view"><div class="grid"><section class="box"><h2>Conversas</h2><div id="conversation-list" class="conversation-list"></div></section><section class="box chat"><div id="chat-title" class="chat-header"><button id="chat-back" type="button">← Voltar</button><span>Selecione uma conversa</span></div><div id="messages" class="messages"><div class="empty">As mensagens do cliente e do robô aparecerão aqui.</div></div><form id="compose" class="compose"><textarea id="message-text" placeholder="Escreva uma mensagem" disabled></textarea><button id="send-message" class="button" disabled>Enviar</button></form></section></div></section>
       <section id="reviews" class="view"><div class="toolbar"><button id="refresh-reviews" class="button secondary">Atualizar revisão</button><button id="finish-reviews" class="button">Finalizar escolhas</button></div><div id="review-list" class="reviews"><div class="empty">Nenhuma revisão pendente.</div></div></section>
       <section id="received" class="view"><div class="toolbar"><button id="refresh-received" class="button secondary">Atualizar fotos</button></div><div id="received-list" class="reviews"><div class="empty">Carregando fotos recebidas…</div></div></section>
       <section id="orders" class="view"><div class="toolbar"><button id="refresh-orders" class="button secondary">Atualizar agora</button></div><section class="box"><h2>Todos os pedidos conhecidos pelo Worker</h2><div id="all-orders" class="list"></div></section></section>
@@ -240,6 +315,68 @@
       button.disabled = false;
     }
   }, true);
+</script>
+<script>
+  /* Atalhos para uma experiência de app no celular. */
+  let deferredInstallPrompt = null;
+  const installButton = document.getElementById('install-app');
+  window.addEventListener('beforeinstallprompt', event => {
+    event.preventDefault();
+    deferredInstallPrompt = event;
+    installButton?.classList.add('ready');
+  });
+  installButton?.addEventListener('click', async () => {
+    if (!deferredInstallPrompt) return;
+    deferredInstallPrompt.prompt();
+    await deferredInstallPrompt.userChoice;
+    deferredInstallPrompt = null;
+    installButton.classList.remove('ready');
+  });
+  window.addEventListener('appinstalled', () => installButton?.classList.remove('ready'));
+  if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(() => {});
+
+  const conversationView = document.getElementById('conversations');
+  const chatBack = document.getElementById('chat-back');
+  chatBack?.addEventListener('click', () => conversationView?.classList.remove('conversation-open'));
+  function ensureChatBack() {
+    const header = document.getElementById('chat-title');
+    if (!header || header.querySelector('#chat-back')) return;
+    const back = document.createElement('button');
+    back.id = 'chat-back';
+    back.type = 'button';
+    back.textContent = '← Voltar';
+    header.prepend(back);
+  }
+  new MutationObserver(ensureChatBack).observe(document.getElementById('chat-title'), { childList:true });
+  document.addEventListener('click', event => {
+    if (event.target.closest('[data-phone]')) conversationView?.classList.add('conversation-open');
+    if (event.target.closest('#chat-back')) conversationView?.classList.remove('conversation-open');
+  });
+
+  /* Mantém a revisão enxuta: editar/refazer abre seus controles só quando
+     necessário; as fotos para escolher continuam visíveis de imediato. */
+  function addMobileReviewToggle() {
+    document.querySelectorAll('[data-review]').forEach(card => {
+      if (card.querySelector('[data-mobile-review-toggle]')) return;
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'review-edit-toggle';
+      button.dataset.mobileReviewToggle = '1';
+      button.textContent = 'Editar ou refazer esta foto';
+      const candidates = card.querySelector('.review-options');
+      candidates?.after(button);
+    });
+  }
+  document.addEventListener('click', event => {
+    const button = event.target.closest('[data-mobile-review-toggle]');
+    if (!button) return;
+    const card = button.closest('[data-review]');
+    card.classList.toggle('editing');
+    button.textContent = card.classList.contains('editing') ? 'Fechar edição/refação' : 'Editar ou refazer esta foto';
+  });
+  const reviewMobileWatcher = document.getElementById('review-list');
+  if (reviewMobileWatcher) new MutationObserver(addMobileReviewToggle).observe(reviewMobileWatcher, { childList:true, subtree:true });
+  addMobileReviewToggle();
 </script>
 </body>
 </html>
