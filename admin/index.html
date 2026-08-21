@@ -247,6 +247,66 @@
   })();
 </script>
 <script>
+  /*
+   * Uma guia ativa não pode iniciar duas leituras ao mesmo tempo. Antes a
+   * troca de guia iniciava a visão geral e a própria guia; o relógio de 5 s
+   * podia iniciar mais outra cópia antes de a anterior acabar. Isso deixava a
+   * página sem resposta quando havia imagens. Abaixo cada fonte possui uma
+   * única atualização em voo e somente a guia atual é carregada.
+   */
+  (() => {
+    const oneAtATime = (fn) => {
+      let running = false;
+      return async (...args) => {
+        if (running) return;
+        running = true;
+        try { return await fn(...args); }
+        finally { running = false; }
+      };
+    };
+
+    load = oneAtATime(load);
+    loadReviews = oneAtATime(loadReviews);
+    loadReceived = oneAtATime(loadReceived);
+    loadActivity = oneAtATime(loadActivity);
+    loadConversation = oneAtATime(loadConversation);
+
+    refreshActiveView = async () => {
+      if (document.hidden) return;
+      if (activeView === 'reviews') return loadReviews();
+      if (activeView === 'received') return loadReceived();
+      if (activeView === 'activity') return loadActivity();
+      if (activeView === 'conversations') {
+        await load();
+        if (selectedPhone) await loadConversation(selectedPhone);
+        return;
+      }
+      return load();
+    };
+
+    if (refreshTimer) {
+      clearInterval(refreshTimer);
+      refreshTimer = setInterval(() => refreshActiveView(), 5000);
+    }
+
+    const observer = new MutationObserver(records => {
+      for (const record of records) {
+        for (const node of record.removedNodes) {
+          if (node.nodeType !== Node.ELEMENT_NODE) continue;
+          const images = [node, ...node.querySelectorAll?.('img') || []];
+          for (const image of images) {
+            if (image.tagName === 'IMG' && image.src.startsWith('blob:')) {
+              URL.revokeObjectURL(image.src);
+            }
+            imageObserver?.unobserve?.(image);
+          }
+        }
+      }
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+  })();
+</script>
+<script>
   /* Preparar edição não envia nada ao PC: ela entra no mesmo lote que as
      demais escolhas quando a revisão for finalizada. */
   document.addEventListener('click', async event => {
