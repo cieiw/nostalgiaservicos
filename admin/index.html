@@ -253,8 +253,28 @@
    * podia iniciar mais outra cópia antes de a anterior acabar. Isso deixava a
    * página sem resposta quando havia imagens. Abaixo cada fonte possui uma
    * única atualização em voo e somente a guia atual é carregada.
-   */
+  */
   (() => {
+    const rawRequest = request;
+    request = async (path, options) => {
+      const data = await rawRequest(path, options);
+      if (path === '/admin-api/reviews' && Array.isArray(data.reviews)) {
+        return { ...data, reviews: data.reviews.slice(0, 24) };
+      }
+      if (path === '/admin-api/received-media' && Array.isArray(data.clients)) {
+        let remaining = 36;
+        const clients = [];
+        for (const client of data.clients) {
+          if (remaining <= 0) break;
+          const media = (client.media || []).slice(0, remaining);
+          if (media.length) clients.push({ ...client, media });
+          remaining -= media.length;
+        }
+        return { ...data, clients };
+      }
+      return data;
+    };
+
     const oneAtATime = (fn) => {
       let running = false;
       return async (...args) => {
