@@ -333,7 +333,7 @@
     installButton.classList.remove('ready');
   });
   window.addEventListener('appinstalled', () => installButton?.classList.remove('ready'));
-  if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(() => {});
+  if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js?build=2').catch(() => {});
 
   const conversationView = document.getElementById('conversations');
   const chatBack = document.getElementById('chat-back');
