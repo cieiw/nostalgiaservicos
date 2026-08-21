@@ -159,7 +159,9 @@
     const API='https://api.nostalgiaservicos.site', key='nostalgia_admin_token';let token=localStorage.getItem(key)||'',state={orders:[],conversations:[]},selectedPhone='',reviews=[],reviewSignature='',overviewSignature='',conversationSignature='',conversationAfter=0,conversationItems=[],receivedSignature='',activitySignature='',activeView='dashboard',refreshTimer=null,imageObserver=null;
     const $=q=>document.querySelector(q), esc=s=>String(s??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
     const ago=t=>{const d=Math.max(0,Date.now()-Number(t||0));if(d<60000)return 'agora';if(d<3600000)return Math.floor(d/60000)+' min';return new Date(Number(t)).toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'})};
-    async function request(path,opt={}){const r=await fetch(API+path,{...opt,headers:{'content-type':'application/json',authorization:'Bearer '+token,...(opt.headers||{})}});const data=await r.json().catch(()=>({}));if(r.status===401){logout();throw new Error('Sessão encerrada.')}if(!r.ok)throw new Error(data.error||'Não foi possível concluir.');return data}
+    const activeReadControllers=new Set();
+    const cancelPanelReads=()=>{for(const controller of activeReadControllers)controller.abort();activeReadControllers.clear()};
+    async function request(path,opt={}){const method=String(opt.method||'GET').toUpperCase(),isRead=method==='GET',controller=new AbortController(),timeout=setTimeout(()=>controller.abort(),12000);if(isRead)activeReadControllers.add(controller);try{const r=await fetch(API+path,{...opt,signal:controller.signal,headers:{'content-type':'application/json',authorization:'Bearer '+token,...(opt.headers||{})}});const data=await r.json().catch(()=>({}));if(r.status===401){logout();throw new Error('Sessão encerrada.')}if(!r.ok)throw new Error(data.error||'Não foi possível concluir.');return data}catch(error){if(error?.name==='AbortError')throw new Error('Atualização interrompida para manter o painel responsivo.');throw error}finally{clearTimeout(timeout);activeReadControllers.delete(controller)}}
     function refreshActiveView(){
       if(document.hidden) return;
       load();
@@ -343,6 +345,7 @@
       button.onclick = () => {
         const nextView = button.dataset.view;
         if (nextView === activeView) return refreshActiveView();
+        cancelPanelReads();
         window.nostalgiaStopQueuedImages?.();
         releaseInactiveImages();
         document.querySelectorAll('[data-view]').forEach(item => item.classList.remove('active'));
