@@ -150,6 +150,63 @@
     .review-options img { height:88px; }
   }
 </style>
+<style>
+  /* Novo acabamento do painel: contraste suave, cartões profundos e foco no
+     uso com uma mão no celular. Essas regras ficam no fim para também
+     refinarem a versão instalada que já existe. */
+  :root { --bg:#070a0e; --panel:#11161d; --panel2:#181e27; --line:#293343; --gold:#ffd21f; --text:#f3f5f7; --muted:#8f99a9; }
+  body { background:radial-gradient(100% 62% at 50% -8%,#182333 0%,#090d12 55%,#05070a 100%); }
+  .box,.card,.review { background:linear-gradient(145deg,#161c25,#10151c); border-color:#293343; box-shadow:0 14px 35px #00000024; }
+  .online { border-color:#345f4d; background:#102c22; color:#a8edc5; }
+  .offline { border-color:#79313b; background:#2c151b; color:#ffabb5; }
+  .button { background:linear-gradient(135deg,#ffe039,#ffc516); border:1px solid #ffe772; box-shadow:0 8px 22px #dca90030; }
+  .button.secondary,.chat-action { background:#1b222c; border-color:#3a4657; color:#edf1f7; box-shadow:inset 0 1px #ffffff0c; }
+  .conversation { margin:0 0 8px; padding:15px 15px 14px; border:1px solid #28313f; border-radius:13px; background:linear-gradient(135deg,#181e27,#11161d); }
+  .conversation:hover,.conversation.active { background:#202837; border-color:#4b5b71; }
+  .conversation-phone { font-size:15px; }
+  .conversation-preview { color:#aab4c2; font-size:13px; }
+  .conversation-detail { color:#7f8b9d; }
+  .review { border-radius:16px; border-color:#334054; }
+  .review-original { width:100%; }
+  .review-original img { width:100%; max-height:460px; object-fit:contain; border:1px solid #2e3a4c; border-radius:12px; background:#090d12; }
+  .review-options .photos label { border-color:#354153; background:#10151d; transition:border-color .16s ease,transform .16s ease,box-shadow .16s ease; }
+  .review-options .photos label:has(input:checked) { border-color:var(--gold); box-shadow:0 0 0 1px #ffe459,0 8px 24px #e8af001f; transform:translateY(-1px); }
+  .review-options .photos img { cursor:pointer; }
+  .review.is-showing-choice .review-original h4::after { content:' · OPÇÃO SELECIONADA'; color:var(--gold); }
+  @media (max-width:780px) {
+    .content { padding:14px 12px calc(90px + env(safe-area-inset-bottom)); }
+    .top { margin:-14px -12px 14px; padding:16px 16px 11px; background:#090d12ed; }
+    .top h1 { font-size:29px; letter-spacing:-.04em; }
+    .side { height:76px; padding:7px 12px calc(8px + env(safe-area-inset-bottom)); background:#111720f2; border-top-color:#303b4c; }
+    .nav { gap:7px; }
+    .nav button { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; min-height:55px; font-size:10px; color:#9fa9b8; }
+    .nav button.active { background:radial-gradient(circle at 50% 0,#5e4e13,#31290e 66%); color:#ffdc32; box-shadow:0 0 20px #d9a80022; }
+    .nav button::first-letter { font-size:17px; }
+    .box h2 { padding:15px 16px; }
+    #dashboard .box { border-radius:15px; overflow:visible; background:transparent; border:0; box-shadow:none; }
+    #dashboard .box h2 { padding:2px 4px 12px; border:0; }
+    .item { margin-bottom:8px; padding:15px; border:1px solid #293343; border-radius:13px; background:linear-gradient(135deg,#171d26,#10151c); }
+    .status { padding:6px 8px; }
+    .review { padding:12px; margin-bottom:14px; }
+    .review h3 { padding:2px 1px 9px; font-size:13px; }
+    .review-original h4,.review-options h4 { font-size:12px; color:#b8c6da; margin:0 0 9px; }
+    .review-original img { height:min(58vw,380px); min-height:205px; max-height:none; border-radius:12px; object-fit:contain; }
+    .review-options { margin-top:14px; padding-top:14px; }
+    .review-options .photos { grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
+    .review-options img { height:132px; object-fit:cover; border-radius:9px 9px 0 0; }
+    .review-options label span { padding:9px 6px; font-size:13px; }
+    .review-options input { margin:0 7px 0 0; accent-color:var(--gold); }
+    .review-options:nth-of-type(3) { display:none; }
+    .review .aspect-picker { margin-top:14px; }
+    .chat { background:#090d12; }
+    .chat-header { background:#0a0f15; border-bottom-color:#26303d; }
+    .messages { background:radial-gradient(140% 60% at 50% 0,#111b27,#090d12 70%); }
+    .bubble { background:#1c232d; border:1px solid #2a3442; border-radius:12px; }
+    .bubble.outgoing { background:linear-gradient(135deg,#594a0d,#31290c); border-color:#907611; color:#fff9e2; }
+    .compose { background:#0e141c; border-top-color:#26303d; }
+    .compose textarea { background:#1a2029; border-color:#313c4c; border-radius:11px; }
+  }
+</style>
 </head>
 <body>
   <section id="login" class="login"><form id="login-form" class="login-card"><img src="../assets/nostalgia-logo.png" alt="Nostalgia"><h1>Painel Nostalgia</h1><p>Entre para acompanhar e controlar o programa instalado no seu computador.</p><input id="password" type="password" autocomplete="current-password" placeholder="Senha do painel" required><div id="login-error" class="error"></div><button class="button" type="submit">Entrar no painel</button></form></section><div id="image-modal" class="image-modal hide" aria-hidden="true"><button type="button">Fechar</button><img alt="Visualização ampliada"></div>
@@ -196,7 +253,12 @@
     $('#rename-client').onclick=async()=>{if(!selectedPhone)return;const current=((state.conversations||[]).find(c=>c.phone===selectedPhone)||{}).name||'';const name=prompt('Nome do cliente (deixe vazio para usar só o número):',current);if(name===null)return;try{await request('/admin-api/conversations/'+encodeURIComponent(selectedPhone)+'/name',{method:'POST',body:JSON.stringify({name})});await load();$('#chat-name').textContent=name.trim()||('Cliente '+selectedPhone)}catch(err){alert(err.message)}};
     $('#message-text').addEventListener('keydown',event=>{if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();$('#compose').requestSubmit()}});
     const closeImageModal=()=>$('#image-modal').classList.add('hide');$('#image-modal').onclick=event=>{if(event.target===$('#image-modal')||event.target.tagName==='BUTTON')closeImageModal()};document.addEventListener('keydown',event=>{if(event.key==='Escape')closeImageModal()});
-    function enableImagePreview(image){image.onclick=event=>{event.preventDefault();event.stopPropagation();const modal=$('#image-modal');modal.querySelector('img').src=image.src;modal.querySelector('img').alt=image.alt;modal.classList.remove('hide')}}
+    function enableImagePreview(image){
+      // Nas opções da revisão, tocar significa escolher a foto — nunca abrir
+      // o visualizador. A própria seleção troca a prévia grande abaixo.
+      if(image.closest('.review-options .photos')) return;
+      image.onclick=event=>{event.preventDefault();event.stopPropagation();const modal=$('#image-modal');modal.querySelector('img').src=image.src;modal.querySelector('img').alt=image.alt;modal.classList.remove('hide')}
+    }
     async function imageUrl(path){const r=await fetch(API+path,{headers:{authorization:'Bearer '+token}});if(!r.ok)throw new Error('imagem indisponível');return URL.createObjectURL(await r.blob())}
     function hydrateImages(root){
       const load=async image=>{const path=image.dataset.media||image.dataset.outboundMedia||image.dataset.image;if(!path||image.dataset.loaded)return;image.dataset.loaded='1';try{image.src=await imageUrl(path);enableImagePreview(image)}catch(_){image.alt=image.alt||'Imagem indisponível'}};
@@ -584,6 +646,42 @@
   const reviewMobileWatcher = document.getElementById('review-list');
   if (reviewMobileWatcher) new MutationObserver(addMobileReviewToggle).observe(reviewMobileWatcher, { childList:true });
   addMobileReviewToggle();
+</script>
+<script>
+  /* Escolher uma opção é uma ação de revisão, não uma ação de ampliar foto.
+     A escolha ocupa imediatamente a prévia principal para comparação. */
+  (() => {
+    const showSelectedChoice = input => {
+      const card = input.closest('[data-review]');
+      const option = input.closest('label');
+      const preview = option?.querySelector('img');
+      const main = card?.querySelector('.review-original img');
+      if (!card || !preview || !main) return;
+      if (preview.src) {
+        main.src = preview.src;
+        main.alt = `Opção ${input.value} selecionada`;
+        main.dataset.loaded = '1';
+      }
+      card.classList.add('is-showing-choice');
+    };
+
+    document.addEventListener('click', event => {
+      const image = event.target.closest('.review-options .photos img');
+      if (!image) return;
+      const option = image.closest('label');
+      const input = option?.querySelector('input[type=radio]');
+      if (!input) return;
+      event.preventDefault();
+      event.stopPropagation();
+      input.checked = true;
+      showSelectedChoice(input);
+    }, true);
+
+    document.addEventListener('change', event => {
+      const input = event.target.closest('[data-review] .review-options .photos input[type=radio]');
+      if (input?.checked) showSelectedChoice(input);
+    });
+  })();
 </script>
 </body>
 </html>
