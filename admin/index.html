@@ -815,15 +815,23 @@
       const input = option?.querySelector('input[type=radio]');
       if (!input) return;
       event.preventDefault();
-      event.stopPropagation();
-      if (input.checked) {
-        input.checked = false;
-        window.reviewSelectionState?.delete(String(input.closest('[data-review]')?.dataset.review || ''));
+      event.stopImmediatePropagation();
+      const card = input.closest('[data-review]');
+      const id = String(card?.dataset.review || '');
+      // Não use input.checked aqui. O navegador alterna o rádio antes/depois
+      // do clique dependendo se o toque caiu no rótulo, imagem ou bolinha;
+      // isso fazia uma segunda passagem desfazer a escolha. O mapa é a única
+      // fonte de verdade até a pessoa finalizar a revisão.
+      const current = Number(window.reviewSelectionState?.get(id) || 0);
+      if (current === Number(input.value)) {
+        card?.querySelectorAll('input[name^="review-"]').forEach(item => { item.checked = false; });
+        window.reviewSelectionState?.delete(id);
         restoreOriginal(input);
         return;
       }
+      card?.querySelectorAll('input[name^="review-"]').forEach(item => { item.checked = false; });
       input.checked = true;
-      window.reviewSelectionState?.set(String(input.closest('[data-review]')?.dataset.review || ''), Number(input.value));
+      window.reviewSelectionState?.set(id, Number(input.value));
       showSelectedChoice(input);
     }, true);
 
