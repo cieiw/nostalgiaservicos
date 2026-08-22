@@ -175,6 +175,8 @@
   /* Refazer não é uma ação isolada: sem opção marcada, a foto já entra para
      refazer no botão final. Portanto esse botão não aparece no painel web. */
   [data-redo] { display:none!important; }
+  /* O texto digitado já prepara a edição para o envio em lote. */
+  [data-edit] { display:none!important; }
   /* A versão escolhida para editar precisa ser comparável à original: nunca
      use recorte de miniatura nessa prévia. */
   .review-options [data-base-preview] { width:100%; height:min(58vw,380px); max-height:none!important; object-fit:contain!important; border:1px solid #2e3a4c; border-radius:12px; background:#090d12; }
@@ -455,6 +457,31 @@
 <script>
   /* Preparar edição não envia nada ao PC: ela entra no mesmo lote que as
      demais escolhas quando a revisão for finalizada. */
+  const saveEditFromField = field => {
+    const card = field.closest('[data-review]');
+    const prompt = field.value.trim();
+    if (!card) return;
+    if (!prompt) {
+      delete card.dataset.editPrompt;
+      delete card.dataset.editBaseVersionId;
+      delete card.dataset.editAspectRatio;
+      return;
+    }
+    card.dataset.editPrompt = prompt;
+    card.dataset.editBaseVersionId = card.querySelector('[data-base]')?.value || '';
+    card.dataset.editAspectRatio = card.querySelector('[data-aspect] input:checked')?.value || '1_1';
+  };
+  // Escrever já prepara a edição. Assim ela segue junto com as demais
+  // decisões somente ao tocar em “Finalizar escolhas”.
+  document.addEventListener('input', event => {
+    const field = event.target.closest('[data-edit-prompt]');
+    if (field) saveEditFromField(field);
+  });
+  document.addEventListener('change', event => {
+    const control = event.target.closest('[data-base],[data-aspect] input');
+    const field = control?.closest('[data-review]')?.querySelector('[data-edit-prompt]');
+    if (field?.value.trim()) saveEditFromField(field);
+  });
   document.addEventListener('click', async event => {
     const button = event.target.closest('[data-edit]');
     if (!button) return;
