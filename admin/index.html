@@ -172,6 +172,9 @@
   .review-options .photos label { border-color:#354153; background:#10151d; transition:border-color .16s ease,transform .16s ease,box-shadow .16s ease; }
   .review-options .photos label:has(input:checked) { border-color:var(--gold); box-shadow:0 0 0 1px #ffe459,0 8px 24px #e8af001f; transform:translateY(-1px); }
   .review-options .photos img { cursor:pointer; }
+  /* Refazer não é uma ação isolada: sem opção marcada, a foto já entra para
+     refazer no botão final. Portanto esse botão não aparece no painel web. */
+  [data-redo] { display:none!important; }
   /* A versão escolhida para editar precisa ser comparável à original: nunca
      use recorte de miniatura nessa prévia. */
   .review-options [data-base-preview] { width:100%; height:min(58vw,380px); max-height:none!important; object-fit:contain!important; border:1px solid #2e3a4c; border-radius:12px; background:#090d12; }
