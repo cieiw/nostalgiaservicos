@@ -448,7 +448,10 @@
   }
   finishReviewButtons();
   const reviewWatcher = document.getElementById('review-list');
-  if (reviewWatcher) new MutationObserver(() => { finishReviewButtons(); applyPendingReviewStatus(); }).observe(reviewWatcher, { childList: true, subtree: true });
+  // Não acompanhe toda a árvore do cartão. Cada miniatura e botão acrescentado
+  // dentro dela também é uma mutação; observar `subtree` aqui criava um ciclo
+  // de trabalho contínuo e fazia o renderizador do navegador travar.
+  if (reviewWatcher) new MutationObserver(() => { finishReviewButtons(); applyPendingReviewStatus(); }).observe(reviewWatcher, { childList: true });
   document.addEventListener('click', event => {
     const button = event.target.closest('[data-version-step]');
     if (!button) return;
@@ -499,7 +502,7 @@
     });
   }
   const reviewList = document.getElementById('review-list');
-  if (reviewList) new MutationObserver(addReviewDiscardButtons).observe(reviewList, { childList: true, subtree: true });
+  if (reviewList) new MutationObserver(addReviewDiscardButtons).observe(reviewList, { childList: true });
   document.addEventListener('click', async event => {
     const button = event.target.closest('[data-discard-review]');
     if (!button) return;
@@ -574,7 +577,7 @@
     button.textContent = card.classList.contains('editing') ? 'Fechar edição/refação' : 'Editar ou refazer esta foto';
   });
   const reviewMobileWatcher = document.getElementById('review-list');
-  if (reviewMobileWatcher) new MutationObserver(addMobileReviewToggle).observe(reviewMobileWatcher, { childList:true, subtree:true });
+  if (reviewMobileWatcher) new MutationObserver(addMobileReviewToggle).observe(reviewMobileWatcher, { childList:true });
   addMobileReviewToggle();
 </script>
 </body>
