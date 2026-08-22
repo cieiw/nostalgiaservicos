@@ -498,7 +498,19 @@
     button.textContent = 'Edição preparada';
   }, true);
 
-  const pendingEditReviews = new Map();
+  const pendingEditReviews = window.pendingEditReviews || new Map();
+  window.pendingEditReviews = pendingEditReviews;
+  // O PC remove a revisão antiga antes de publicar as novas miniaturas. Ao
+  // observar essa ausência, liberamos o marcador local para que o cartão
+  // reapareça normalmente quando o resultado completo voltar do PC.
+  const loadReviewsBeforePendingEdits = loadReviews;
+  loadReviews = async (...args) => {
+    const result = await loadReviewsBeforePendingEdits(...args);
+    pendingEditReviews.forEach((_state, id) => {
+      if (!(reviews || []).some(item => String(item.item_id) === String(id))) pendingEditReviews.delete(id);
+    });
+    return result;
+  };
   function addVersionNavigation() {
     document.querySelectorAll('[data-review]').forEach(card => {
       const select = card.querySelector('[data-base]');
@@ -518,16 +530,13 @@
       if (pending && Number(remote?.candidates || 0) === 0) pending.resetSeen = true;
       if (pending?.resetSeen && Number(remote?.candidates || 0) > 0) pendingEditReviews.delete(id);
       let status = card.querySelector('[data-processing-status]');
-      if (!pendingEditReviews.has(id)) { status?.remove(); return; }
-      if (!status) {
-        status = document.createElement('p');
-        status.dataset.processingStatus = '1';
-        status.className = 'sub';
-        status.style.cssText = 'margin:10px 0;color:#ffd766;font-weight:700';
-        card.querySelector('h3')?.after(status);
-      }
-      status.textContent = 'Edição enviada. Aguardando processamento e novas opções…';
-      card.querySelectorAll('button, textarea, select, input').forEach(control => control.disabled = true);
+      // Uma edição já enviada não é uma escolha pendente: o cartão sai da
+      // revisão até o PC baixar as novas opções e publicá-las novamente.
+      // Isso evita que a versão antiga seja selecionada enquanto gera.
+      const waiting = pendingEditReviews.has(id);
+      card.hidden = waiting;
+      if (!waiting) { status?.remove(); return; }
+      status?.remove();
     });
   }
   function finishReviewButtons() {
