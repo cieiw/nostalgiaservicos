@@ -626,6 +626,12 @@
       const main = card?.querySelector('.review-original img');
       if (!card || !main) return;
       card.classList.remove('is-showing-choice');
+      // Ao voltar para a original, a proporção padrão também volta a ser a
+      // que foi detectada nessa foto (e não uma escolha anterior de edição).
+      const ratioText = card.querySelector('h3')?.textContent.match(/(16:9|4:3|1:1|3:4|9:16)/)?.[1] || '1:1';
+      const originalAspect = ratioText.replace(':', '_');
+      const aspectInput = card.querySelector(`[data-aspect] input[value="${originalAspect}"]`);
+      if (aspectInput) aspectInput.checked = true;
       main.alt = 'Foto original';
       if (main.dataset.originalSrc) {
         main.src = main.dataset.originalSrc;
