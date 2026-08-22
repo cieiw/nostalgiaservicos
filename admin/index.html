@@ -658,6 +658,14 @@
     const card = button.closest('[data-review]');
     card.classList.toggle('editing');
     button.textContent = card.classList.contains('editing') ? 'Fechar edição/refação' : 'Editar ou refazer esta foto';
+    if (!card.classList.contains('editing')) {
+      const field = card.querySelector('[data-edit-prompt]');
+      if (field) field.value = '';
+      delete card.dataset.editPrompt;
+      delete card.dataset.editBaseVersionId;
+      delete card.dataset.editAspectRatio;
+      return;
+    }
     // Ao abrir a edição, a versão aprovada é a base natural. A original e as
     // outras gerações continuam disponíveis no seletor para trocar depois.
     if (card.classList.contains('editing')) {
