@@ -556,36 +556,6 @@
   }, true);
 </script>
 <script>
-  /* Permite descartar uma revisão também pelo painel do celular. */
-  function addReviewDiscardButtons() {
-    document.querySelectorAll('[data-review]').forEach(card => {
-      if (card.querySelector('[data-discard-review]')) return;
-      const button = document.createElement('button');
-      button.className = 'button danger';
-      button.type = 'button';
-      button.dataset.discardReview = '1';
-      button.textContent = 'Apagar da revisão';
-      card.append(button);
-    });
-  }
-  const reviewList = document.getElementById('review-list');
-  if (reviewList) new MutationObserver(addReviewDiscardButtons).observe(reviewList, { childList: true });
-  document.addEventListener('click', async event => {
-    const button = event.target.closest('[data-discard-review]');
-    if (!button) return;
-    event.preventDefault();
-    const card = button.closest('[data-review]');
-    button.disabled = true;
-    try {
-      await request('/admin-api/reviews/discard', { method: 'POST', body: JSON.stringify({ id: card.dataset.review }) });
-      button.textContent = 'Remoção enviada ao PC';
-    } catch (err) {
-      alert(err.message);
-      button.disabled = false;
-    }
-  }, true);
-</script>
-<script>
   /* Atalhos para uma experiência de app no celular. */
   let deferredInstallPrompt = null;
   const installButton = document.getElementById('install-app');
@@ -651,12 +621,33 @@
   /* Escolher uma opção é uma ação de revisão, não uma ação de ampliar foto.
      A escolha ocupa imediatamente a prévia principal para comparação. */
   (() => {
+    const restoreOriginal = input => {
+      const card = input.closest('[data-review]');
+      const main = card?.querySelector('.review-original img');
+      if (!card || !main) return;
+      card.classList.remove('is-showing-choice');
+      main.alt = 'Foto original';
+      if (main.dataset.originalSrc) {
+        main.src = main.dataset.originalSrc;
+        return;
+      }
+      const originalPath = main.dataset.image;
+      if (!originalPath) return;
+      main.removeAttribute('src');
+      main.dataset.loaded = '';
+      imageUrl(originalPath).then(url => {
+        main.src = url;
+        main.dataset.originalSrc = url;
+        main.dataset.loaded = '1';
+      }).catch(() => { main.alt = 'Foto original indisponível'; });
+    };
     const showSelectedChoice = input => {
       const card = input.closest('[data-review]');
       const option = input.closest('label');
       const preview = option?.querySelector('img');
       const main = card?.querySelector('.review-original img');
       if (!card || !preview || !main) return;
+      if (!main.dataset.originalSrc && main.src) main.dataset.originalSrc = main.src;
       if (preview.src) {
         main.src = preview.src;
         main.alt = `Opção ${input.value} selecionada`;
@@ -666,13 +657,17 @@
     };
 
     document.addEventListener('click', event => {
-      const image = event.target.closest('.review-options .photos img');
-      if (!image) return;
-      const option = image.closest('label');
+      const option = event.target.closest('.review-options .photos label');
+      if (!option) return;
       const input = option?.querySelector('input[type=radio]');
       if (!input) return;
       event.preventDefault();
       event.stopPropagation();
+      if (input.checked) {
+        input.checked = false;
+        restoreOriginal(input);
+        return;
+      }
       input.checked = true;
       showSelectedChoice(input);
     }, true);
