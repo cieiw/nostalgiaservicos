@@ -172,6 +172,9 @@
   .review-options .photos label { border-color:#354153; background:#10151d; transition:border-color .16s ease,transform .16s ease,box-shadow .16s ease; }
   .review-options .photos label:has(input:checked) { border-color:var(--gold); box-shadow:0 0 0 1px #ffe459,0 8px 24px #e8af001f; transform:translateY(-1px); }
   .review-options .photos img { cursor:pointer; }
+  /* A versão escolhida para editar precisa ser comparável à original: nunca
+     use recorte de miniatura nessa prévia. */
+  .review-options [data-base-preview] { width:100%; height:min(58vw,380px); max-height:none!important; object-fit:contain!important; border:1px solid #2e3a4c; border-radius:12px; background:#090d12; }
   .review.is-showing-choice .review-original h4::after { content:' · OPÇÃO SELECIONADA'; color:var(--gold); }
   @media (max-width:780px) {
     .content { padding:14px 12px calc(90px + env(safe-area-inset-bottom)); }
@@ -194,6 +197,7 @@
     .review-options { margin-top:14px; padding-top:14px; }
     .review-options .photos { grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
     .review-options img { height:132px; object-fit:cover; border-radius:9px 9px 0 0; }
+    .review.editing .review-options [data-base-preview] { width:100%; height:min(58vw,380px); max-height:none!important; object-fit:contain!important; border-radius:12px; }
     .review-options label span { padding:9px 6px; font-size:13px; }
     .review-options input { margin:0 7px 0 0; accent-color:var(--gold); }
     .review-options:nth-of-type(3) { display:none; }
