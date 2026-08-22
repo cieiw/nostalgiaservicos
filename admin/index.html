@@ -507,6 +507,14 @@
   window.reviewAspectState = reviewAspectState;
   const pendingEditReviews = window.pendingEditReviews || new Map();
   window.pendingEditReviews = pendingEditReviews;
+  function candidateVersionId(card, optionNumber) {
+    const remote = (reviews || []).find(item => String(item.item_id) === String(card?.dataset.review));
+    const pattern = new RegExp(`Opção\\s*${Number(optionNumber)}(?:\\D|$)`, 'i');
+    // Há uma versão por opção a cada geração. A última é exatamente a que a
+    // miniatura atual representa, independentemente de ser a 1ª, 2ª ou 10ª.
+    const matches = (remote?.versions || []).filter(version => pattern.test(String(version.label || '')));
+    return String(matches.at(-1)?.version_id || '');
+  }
   function restoreReviewSelectionState() {
     document.querySelectorAll('[data-review]').forEach(card => {
       const id = String(card.dataset.review);
@@ -695,12 +703,18 @@
     const remembered = Number(window.reviewSelectionState?.get(id) || 0);
     const checked = card.querySelector('input[name^="review-"]:checked');
     const input = checked || (remembered ? card.querySelector(`input[name^="review-"][value="${remembered}"]`) : null);
+    card.querySelectorAll('input[name^="review-"]').forEach(candidate => {
+      const versionId = candidateVersionId(card, candidate.value);
+      if (versionId) candidate.dataset.versionId = versionId;
+    });
     if (!input) return;
     input.checked = true;
     input.dispatchEvent(new Event('change', { bubbles: true }));
     const base = card.querySelector('[data-base]');
     if (!base) return;
-    const option = [...base.options].find(item => new RegExp(`Opção\\s*${input.value}(?:\\D|$)`, 'i').test(item.textContent));
+    const versionId = input.dataset.versionId || candidateVersionId(card, input.value);
+    const option = [...base.options].find(item => item.value === versionId)
+      || [...base.options].find(item => new RegExp(`Opção\\s*${input.value}(?:\\D|$)`, 'i').test(item.textContent));
     if (!option) return;
     base.value = option.value;
     base.dispatchEvent(new Event('change', { bubbles: true }));
