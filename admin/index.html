@@ -640,6 +640,18 @@
       candidates?.after(button);
     });
   }
+  function addAspectRedoPromptButton() {
+    document.querySelectorAll('[data-review]').forEach(card => {
+      const picker = card.querySelector('[data-aspect]');
+      if (!picker || picker.querySelector('[data-aspect-redo-prompt]')) return;
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'button secondary';
+      button.dataset.aspectRedoPrompt = '1';
+      button.textContent = 'Escrever prompt para refazer nesta proporção';
+      picker.append(button);
+    });
+  }
   document.addEventListener('click', event => {
     const button = event.target.closest('[data-mobile-review-toggle]');
     if (!button) return;
@@ -660,9 +672,27 @@
       }
     }
   });
+  document.addEventListener('click', event => {
+    const button = event.target.closest('[data-aspect-redo-prompt]');
+    if (!button) return;
+    event.preventDefault();
+    const card = button.closest('[data-review]');
+    const ratio = card?.querySelector('[data-aspect] input:checked')?.value || '1_1';
+    const field = card?.querySelector('[data-edit-prompt]');
+    if (!field) return;
+    field.value = `Refazer na proporção ${ratio.replace('_', ':')}`;
+    field.dispatchEvent(new Event('input', { bubbles: true }));
+    card.classList.add('editing');
+    card.querySelector('[data-mobile-review-toggle]')?.replaceChildren('Fechar edição/refação');
+    field.focus();
+  });
   const reviewMobileWatcher = document.getElementById('review-list');
-  if (reviewMobileWatcher) new MutationObserver(addMobileReviewToggle).observe(reviewMobileWatcher, { childList:true });
+  if (reviewMobileWatcher) new MutationObserver(() => {
+    addMobileReviewToggle();
+    addAspectRedoPromptButton();
+  }).observe(reviewMobileWatcher, { childList:true });
   addMobileReviewToggle();
+  addAspectRedoPromptButton();
 </script>
 <script>
   /* Escolher uma opção é uma ação de revisão, não uma ação de ampliar foto.
