@@ -687,6 +687,24 @@
       picker.append(button);
     });
   }
+  function useSelectedOptionAsEditBase(card) {
+    if (!card?.isConnected) return;
+    const id = String(card.dataset.review || '');
+    // A seleção pode ter acabado de ser redesenhada pela atualização da
+    // revisão. O rascunho é a fonte de verdade até "Finalizar escolhas".
+    const remembered = Number(window.reviewSelectionState?.get(id) || 0);
+    const checked = card.querySelector('input[name^="review-"]:checked');
+    const input = checked || (remembered ? card.querySelector(`input[name^="review-"][value="${remembered}"]`) : null);
+    if (!input) return;
+    input.checked = true;
+    input.dispatchEvent(new Event('change', { bubbles: true }));
+    const base = card.querySelector('[data-base]');
+    if (!base) return;
+    const option = [...base.options].find(item => new RegExp(`Opção\\s*${input.value}(?:\\D|$)`, 'i').test(item.textContent));
+    if (!option) return;
+    base.value = option.value;
+    base.dispatchEvent(new Event('change', { bubbles: true }));
+  }
   document.addEventListener('click', event => {
     const button = event.target.closest('[data-mobile-review-toggle]');
     if (!button) return;
@@ -701,19 +719,11 @@
       delete card.dataset.editAspectRatio;
       return;
     }
-    // Ao abrir a edição, a versão aprovada é a base natural. A original e as
-    // outras gerações continuam disponíveis no seletor para trocar depois.
-    if (card.classList.contains('editing')) {
-      const selected = card.querySelector('input[name^="review-"]:checked')?.value;
-      const base = card.querySelector('[data-base]');
-      if (selected && base) {
-        const option = [...base.options].find(item => new RegExp(`Opção\\s*${selected}(?:\\D|$)`, 'i').test(item.textContent));
-        if (option) {
-          base.value = option.value;
-          base.dispatchEvent(new Event('change', { bubbles: true }));
-        }
-      }
-    }
+    // A versão aprovada vira a base imediatamente. Repetimos no próximo
+    // frame porque a atualização automática pode redesenhar o cartão no mesmo
+    // toque em que a edição é aberta.
+    useSelectedOptionAsEditBase(card);
+    requestAnimationFrame(() => useSelectedOptionAsEditBase(card));
   });
   document.addEventListener('click', event => {
     const button = event.target.closest('[data-aspect-redo-prompt]');
