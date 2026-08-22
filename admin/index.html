@@ -646,6 +646,19 @@
     const card = button.closest('[data-review]');
     card.classList.toggle('editing');
     button.textContent = card.classList.contains('editing') ? 'Fechar edição/refação' : 'Editar ou refazer esta foto';
+    // Ao abrir a edição, a versão aprovada é a base natural. A original e as
+    // outras gerações continuam disponíveis no seletor para trocar depois.
+    if (card.classList.contains('editing')) {
+      const selected = card.querySelector('input[name^="review-"]:checked')?.value;
+      const base = card.querySelector('[data-base]');
+      if (selected && base) {
+        const option = [...base.options].find(item => new RegExp(`Opção\\s*${selected}(?:\\D|$)`, 'i').test(item.textContent));
+        if (option) {
+          base.value = option.value;
+          base.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+      }
+    }
   });
   const reviewMobileWatcher = document.getElementById('review-list');
   if (reviewMobileWatcher) new MutationObserver(addMobileReviewToggle).observe(reviewMobileWatcher, { childList:true });
