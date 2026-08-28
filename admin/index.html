@@ -218,11 +218,29 @@
     .compose textarea { background:#1a2029; border-color:#313c4c; border-radius:11px; }
   }
 </style>
+<style id="mobile-navigation-and-orders">
+  .nav-icon{display:inline-grid;place-items:center;flex:none;width:28px;height:28px;color:currentColor}
+  .nav-icon svg{width:25px;height:25px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+  .order-row{width:100%;border:0;border-bottom:1px solid #272c35;background:transparent;color:var(--text);text-align:left;cursor:pointer}
+  .order-row:hover,.order-row:focus-visible{background:#202837;outline:none}
+  .order-chevron{font-size:27px;line-height:1;color:#b6c0cf;padding-left:4px}
+  .order-modal{position:fixed;inset:0;z-index:60;display:flex;justify-content:center;align-items:center;padding:16px;background:#05070bd9}
+  .order-modal-card{width:min(720px,100%);max-height:min(86vh,760px);overflow:auto;background:linear-gradient(145deg,#161c25,#0f141b);border:1px solid #3a4658;border-radius:16px;box-shadow:0 20px 80px #000a;padding:18px}
+  .order-modal-head{display:flex;align-items:flex-start;gap:12px;margin-bottom:12px}.order-modal-head h2{margin:0;font-size:18px}.order-modal-close{margin-left:auto;border:1px solid #3a4657;border-radius:8px;background:#202732;color:#fff;padding:7px 11px;cursor:pointer}
+  .order-detail-actions{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 14px}.order-detail-actions .button{min-height:38px}
+  .order-photo-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.order-photo{margin:0;border:1px solid #303b4b;border-radius:10px;background:#0c1118;padding:7px}.order-photo img{display:block;width:100%;height:210px;object-fit:contain;background:#080b10;border-radius:7px}.order-photo figcaption{padding:7px 2px 1px;font-size:11px;color:#c4cede;overflow-wrap:anywhere}.order-photo .included{color:#9be3b9}.order-photo .excluded{color:#f3b7a1}
+  @media(max-width:780px){
+    .nav{align-items:stretch!important}
+    .nav button{display:flex!important;flex-direction:column;gap:3px;align-items:center;justify-content:center;min-height:62px;padding:6px 3px!important;font-size:11px!important;line-height:1.1}
+    .nav-icon{width:29px;height:29px}.nav-icon svg{width:25px;height:25px}
+    .order-modal{padding:9px;align-items:flex-end}.order-modal-card{max-height:90dvh;border-radius:16px 16px 0 0;padding:15px}.order-photo-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.order-photo{padding:5px}.order-photo img{height:145px}.order-photo figcaption{font-size:10px}
+  }
+</style>
 </head>
 <body>
   <section id="login" class="login"><form id="login-form" class="login-card"><img src="../assets/nostalgia-logo.png" alt="Nostalgia"><h1>Painel Nostalgia</h1><p>Entre para acompanhar e controlar o programa instalado no seu computador.</p><input id="password" type="password" autocomplete="current-password" placeholder="Senha do painel" required><div id="login-error" class="error"></div><button class="button" type="submit">Entrar no painel</button></form></section><div id="image-modal" class="image-modal hide" aria-hidden="true"><button type="button">Fechar</button><img alt="Visualização ampliada"></div>
   <main id="app" class="app hide">
-    <aside class="side"><div class="brand"><img src="../assets/nostalgia-logo.png" alt=""><div>Nostalgia<br><span>Administração</span></div></div><nav class="nav"><div class="nav-title">Painel</div><button class="active" data-view="dashboard">▣ Pedidos</button><button data-view="conversations">◉ Conversas</button><button data-view="reviews">▧ Revisão</button></nav><div class="bottom"><button id="logout" class="button secondary">Sair</button></div></aside>
+    <aside class="side"><div class="brand"><img src="../assets/nostalgia-logo.png" alt=""><div>Nostalgia<br><span>Administração</span></div></div><nav class="nav"><div class="nav-title">Painel</div><button class="active" data-view="dashboard"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 8.5h16v11H4zM7 8.5V5h10v3.5M8 12h8M8 15h5"/></svg></span><span>Pedidos</span></button><button data-view="conversations"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 6.5h14v10H9l-4 3v-13zM8 10h8M8 13h5"/></svg></span><span>Conversas</span></button><button data-view="reviews"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="m7 15 3-3 2 2 3-4 2 3M8 8h.01"/></svg></span><span>Revisão</span></button></nav><div class="bottom"><button id="logout" class="button secondary">Sair</button></div></aside>
     <section class="content"><header class="top"><div><h1 id="title">Pedidos</h1><p id="subtitle">Pedidos recentes recebidos pelo atendimento.</p></div><button id="install-app" type="button">Instalar</button><div id="connection" class="online">● Atualizando</div></header>
       <section id="dashboard" class="view active"><section class="box"><h2>Pedidos recentes</h2><div id="recent-orders" class="list"></div></section></section>
       <section id="conversations" class="view"><div class="grid"><section class="box"><h2>Conversas</h2><div id="conversation-list" class="conversation-list"></div></section><section class="box chat"><div id="chat-title" class="chat-header"><button id="chat-back" type="button" class="chat-action">← Voltar</button><span id="chat-name">Selecione uma conversa</span><button id="rename-client" type="button" class="chat-action" disabled>Nome</button><button id="mark-attention" type="button" class="chat-action" disabled>🟠 Revisar</button><button id="manage-order" type="button" class="chat-action" disabled>Pedido</button><button id="mark-read" type="button" class="chat-action" disabled>✅ Lida</button></div><div id="messages" class="messages"><div class="empty">As mensagens do cliente e do robô aparecerão aqui.</div></div><form id="compose" class="compose"><textarea id="message-text" placeholder="Escreva uma mensagem" disabled></textarea><button id="send-message" class="button" disabled>Enviar</button></form></section></div></section>
@@ -254,7 +272,7 @@
     function logout(){localStorage.removeItem(key);token='';$('#app').classList.add('hide');$('#login').classList.remove('hide')}
     $('#login-form').addEventListener('submit',async e=>{e.preventDefault();$('#login-error').textContent='';try{const r=await fetch(API+'/admin-api/login',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({password:$('#password').value})});const d=await r.json();if(!r.ok)throw new Error(d.error);token=d.token;localStorage.setItem(key,token);show()}catch(err){$('#login-error').textContent=err.message||'Não foi possível entrar.'}});$('#logout').onclick=logout;
     document.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>{document.querySelectorAll('[data-view]').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.view').forEach(x=>x.classList.remove('active'));b.classList.add('active');$('#'+b.dataset.view).classList.add('active');activeView=b.dataset.view;$('#title').textContent=b.textContent.trim().replace(/^[^\wÀ-ÿ]+\s*/,'');refreshActiveView();});
-    function orderRow(o){return `<div class="item"><div class="avatar">${esc(o.photos||0)}</div><div class="grow"><div class="name">Cliente ${esc(o.phone)}</div><div class="sub">${esc(o.photos||0)} foto(s) · ${ago(o.created_at)}</div></div><span class="status ${esc(o.status)}">${esc(String(o.status).replaceAll('_',' '))}</span></div>`}
+    function orderRow(o){const localId=Number(o.local_order_id||o.id||0);return `<button type="button" class="item order-row" data-order-id="${localId}" data-worker-order-id="${Number(o.id||0)}"><div class="avatar">${esc(o.photos||0)}</div><div class="grow"><div class="name">Cliente ${esc(formatPhone(o.phone)||o.phone||'')}</div><div class="sub">${esc(o.photos||0)} foto(s) · ${ago(o.created_at)}</div></div><span class="status ${esc(o.status)}">${esc(String(o.status).replaceAll('_',' '))}</span><span class="order-chevron" aria-hidden="true">›</span></button>`}
     function render(){const orders=state.orders,cs=state.conversations;const html=orders.length?orders.slice(0,8).map(orderRow).join(''):'<div class="empty">Nenhum pedido ainda.</div>';$('#recent-orders').innerHTML=html;$('#conversation-list').innerHTML=cs.length?cs.map(c=>{const photos=Number(c.open_photos||0),detail=photos?`${photos} foto(s) no pedido`:'';const preview=String(c.last_message||'Sem mensagens');const prefix=c.last_direction==='outgoing'?'Robô: ':'';const dot=Number(c.attention_at||0)?'<i class="unread-dot attention-dot" aria-label="Revisão pendente"></i>':(c.photo_unread?'<i class="unread-dot photo-unread-dot" aria-label="Nova foto recebida"></i>':(c.unread?'<i class="unread-dot" aria-label="Nova mensagem"></i>':''));return `<button class="conversation" data-phone="${esc(c.phone)}"><span class="conversation-top"><span class="conversation-phone">${dot}${esc(c.name||formatPhone(c.phone))}</span><time class="conversation-time">${esc(conversationTime(c.last_at))}</time></span><span class="conversation-preview">${esc(prefix+preview)}</span>${detail?`<span class="conversation-detail">${esc(detail)}</span>`:''}</button>`}).join(''):'<div class="empty">Nenhuma conversa disponível.</div>';document.querySelectorAll('[data-phone]').forEach(b=>b.onclick=()=>loadConversation(b.dataset.phone));}
     async function load(){overviewLoading=true;try{const data=await request('/admin-api/overview');const desktop=data.desktop||{};desktopOnlineKnown=desktop.online===true;const signature=JSON.stringify([data.orders||[],data.conversations||[],data.commands||[],desktop.online,desktop.generation_paused]);if(signature===overviewSignature)return;overviewSignature=signature;state=data;render();$('#connection').classList.toggle('offline',!desktop.online);$('#connection').textContent=desktop.online?'● PC conectado':'● PC desconectado';const toggle=$('#toggle-generation'),stateLabel=$('#generation-state'),detail=$('#generation-detail');if(toggle){const paused=desktop.generation_paused===true;stateLabel.textContent=!desktop.online?'PC desconectado':paused?'Geração pausada':'Geração em execução';detail.textContent=!desktop.online?'O próximo comando ficará aguardando o PC.':paused?'A fila está quieta até você continuar.':'O Nostalgia está processando a fila normalmente.';toggle.disabled=false;toggle.dataset.command=paused?'resume_generation':'pause_generation';toggle.textContent=paused?'Continuar geração':'Pausar geração';toggle.className='button '+(paused?'':'danger')}}catch(err){if(desktopOnlineKnown===null){$('#connection').classList.remove('offline');$('#connection').textContent='● Atualizando'}}finally{overviewLoading=false}}
     const conversationItem=item=>item.type==='media'?`<article class="bubble media"><img data-media="/admin-api/media/${item.id}" alt="${item.category==='payment_proof'?'Comprovante de pagamento':'Foto recebida'}"><small>Cliente · ${item.category==='payment_proof'?'Comprovante de pagamento':'Foto recebida'} · ${ago(item.created_at)}</small></article>`:item.direction==='outgoing'&&(item.kind==='image'||item.kind==='template')?`<article class="bubble media outgoing"><img data-outbound-media="/admin-api/outbound-media/${encodeURIComponent(item.message_id)}" alt="Foto enviada"><small>Robô · Foto enviada · ${ago(item.created_at)}</small></article>`:`<article class="bubble ${item.direction==='outgoing'?'outgoing':''}">${esc(item.body)}<small>${item.direction==='outgoing'?'Robô':'Cliente'} · ${ago(item.created_at)}</small></article>`;
@@ -682,6 +700,7 @@
       id: card.dataset.review,
       selected: Number(card.querySelector('input[name^=review-]:checked')?.value || 0),
       aspect_ratio: card.dataset.editAspectRatio || card.querySelector('[data-aspect] input:checked')?.value || '1_1',
+      rotation_degrees: Number(card.dataset.rotationDegrees || 0) % 360,
       edit_prompt: card.dataset.editPrompt || '',
       base_version_id: card.dataset.editBaseVersionId || ''
     }));
@@ -953,6 +972,19 @@
 </script>
 <script>
   (() => {
+    const reviewRotationState = window.reviewRotationState || new Map();
+    window.reviewRotationState = reviewRotationState;
+    const syncRotationState = () => document.querySelectorAll('[data-review]').forEach(card => {
+      const remote = (reviews || []).find(item => String(item.item_id) === String(card.dataset.review));
+      if (!remote) return;
+      const id = String(card.dataset.review);
+      const rotation = Number(reviewRotationState.get(id) ?? remote.rotation_degrees ?? 0) % 360;
+      reviewRotationState.set(id, (rotation + 360) % 360);
+      card.dataset.rotationDegrees = String((rotation + 360) % 360);
+      card.dataset.previewRotation = card.dataset.rotationDegrees;
+      const image = card.querySelector('.review-original img');
+      if (image && rotation) image.style.transform = `rotate(${rotation}deg)`;
+    });
     const addRotateButtons = () => document.querySelectorAll('[data-review]').forEach(card => {
       const original = card.querySelector('.review-original');
       if (!original || original.querySelector('[data-rotate-original]')) return;
@@ -961,25 +993,70 @@
       button.dataset.rotateOriginal = '1'; button.textContent = '↻ Girar foto original';
       original.append(button);
     });
-    document.addEventListener('click', async event => {
+    document.addEventListener('click', event => {
       const button = event.target.closest('[data-rotate-original]');
       if (!button) return;
       const card = button.closest('[data-review]');
       if (!card) return;
-      button.disabled = true; button.textContent = 'Girando no computador…';
-      try {
-        await request('/admin-api/reviews/rotate', { method:'POST', body:JSON.stringify({id:card.dataset.review}) });
-        const image = card.querySelector('.review-original img');
-        const rotation = (Number(card.dataset.previewRotation || 0) + 90) % 360;
-        card.dataset.previewRotation = rotation;
-        if (image) image.style.transform = `rotate(${rotation}deg)`;
-        button.disabled = false;
-        button.textContent = '↻ Girar novamente';
-      } catch(error) { button.disabled = false; button.textContent = '↻ Girar foto original'; alert(error.message); }
+      event.preventDefault();
+      // O giro é somente um rascunho visual no celular. O computador recebe
+      // uma única decisão, com o estado final, quando "Finalizar escolhas"
+      // for pressionado; assim três giros não criam três comandos na fila.
+      const image = card.querySelector('.review-original img');
+      const rotation = (Number(card.dataset.previewRotation || card.dataset.rotationDegrees || 0) + 90) % 360;
+      reviewRotationState.set(String(card.dataset.review), rotation);
+      card.dataset.previewRotation = String(rotation);
+      card.dataset.rotationDegrees = String(rotation);
+      if (image) image.style.transform = `rotate(${rotation}deg)`;
+      button.textContent = '↻ Girar novamente';
     });
     const root = document.getElementById('review-list');
-    if (root) new MutationObserver(addRotateButtons).observe(root,{childList:true,subtree:true});
+    if (root) new MutationObserver(() => { syncRotationState(); addRotateButtons(); }).observe(root,{childList:true,subtree:true});
+    syncRotationState();
     addRotateButtons();
+  })();
+</script>
+<script>
+  /* Detalhe de pedido: as fotos são carregadas somente quando o pedido é
+     aberto, evitando decodificar a fila inteira ao entrar na aba. */
+  (() => {
+    let modal = null, currentOrderId = 0;
+    const escOrder = value => String(value ?? '').replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+    const close = () => { if (modal) modal.remove(); modal = null; currentOrderId = 0; };
+    const statusLabel = value => String(value || '').replaceAll('_',' ');
+    const createModal = () => {
+      close();
+      modal = document.createElement('div'); modal.className = 'order-modal'; modal.setAttribute('role','dialog'); modal.setAttribute('aria-modal','true');
+      modal.innerHTML = '<section class="order-modal-card"><div class="order-modal-head"><div><h2>Pedido</h2><p class="sub">Carregando fotos…</p></div><button type="button" class="order-modal-close">Fechar</button></div><div class="order-detail-actions"></div><div class="order-photo-grid"><div class="empty">Carregando fotos do pedido…</div></div></section>';
+      modal.querySelector('.order-modal-close').onclick = close;
+      modal.addEventListener('click', event => { if (event.target === modal) close(); });
+      document.body.appendChild(modal);
+      return modal;
+    };
+    const renderDetail = (data, id) => {
+      const order = data.order || {}, photos = order.photos || [], head = modal.querySelector('.order-modal-head'), actions = modal.querySelector('.order-detail-actions'), grid = modal.querySelector('.order-photo-grid');
+      head.querySelector('h2').textContent = `Pedido #${order.id || id}`;
+      head.querySelector('.sub').textContent = `${formatPhone(order.phone) || order.phone || 'Cliente'} · ${photos.length} foto(s) · ${statusLabel(order.status) || 'status sincronizado'}`;
+      actions.innerHTML = `<button type="button" class="button secondary" data-order-action="pause" data-order-id="${Number(order.id || id)}">Pausar / retomar</button><button type="button" class="button danger" data-order-action="restart" data-order-id="${Number(order.id || id)}">Reiniciar pedido</button><span class="sub" data-order-status>O pedido pode ser controlado pelo computador conectado.</span>`;
+      grid.innerHTML = photos.length ? photos.map(photo => `<figure class="order-photo"><${photo.media_id ? `img data-image="/admin-api/media/${Number(photo.media_id)}" loading="lazy" alt="Foto do pedido"` : `div class="sub"`} >${photo.media_id ? '' : 'Imagem aguardando sincronização'}</${photo.media_id ? 'img' : 'div'}><figcaption>${escOrder(photo.source_name)}<br><span class="${photo.included ? 'included' : 'excluded'}">${photo.included ? 'Incluída no pedido' : 'Fora do pedido'}</span></figcaption></figure>`).join('') : '<div class="empty">Nenhuma foto sincronizada para este pedido.</div>';
+      if (typeof hydrateImages === 'function') hydrateImages(grid);
+    };
+    const open = async id => {
+      id = Number(id || 0); if (!id) return;
+      const root = createModal(); currentOrderId = id;
+      try { renderDetail(await request(`/admin-api/orders/${id}/photos`), id); }
+      catch (error) { root.querySelector('.order-modal-card').innerHTML = `<div class="order-modal-head"><div><h2>Pedido #${id}</h2><p class="sub">${escOrder(error.message)}</p></div><button type="button" class="order-modal-close">Fechar</button></div>`; root.querySelector('.order-modal-close').onclick = close; }
+    };
+    document.addEventListener('click', async event => {
+      const row = event.target.closest('[data-order-id]');
+      if (row && !event.target.closest('[data-order-action]')) { event.preventDefault(); open(row.dataset.orderId); return; }
+      const action = event.target.closest('[data-order-action]');
+      if (!action || Number(action.dataset.orderId) !== currentOrderId) return;
+      action.disabled = true; const old = action.textContent; action.textContent = action.dataset.orderAction === 'restart' ? 'Reiniciando…' : 'Aplicando…';
+      try { await request(`/admin-api/orders/${currentOrderId}/${action.dataset.orderAction}`, { method:'POST', body:'{}' }); action.textContent = 'Comando enviado ao PC'; modal.querySelector('[data-order-status]').textContent = 'Aguardando confirmação do computador…'; }
+      catch (error) { action.disabled = false; action.textContent = old; alert(error.message); }
+    });
+    document.addEventListener('keydown', event => { if (event.key === 'Escape' && modal) close(); });
   })();
 </script>
 </body>
