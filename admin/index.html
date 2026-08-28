@@ -376,7 +376,14 @@
     // resolvida sem alterar o pedido, a revisão ou as mensagens.
     document.addEventListener('click', event => {
       const row = event.target.closest('[data-phone]');
-      if (row) setTimeout(() => { const button = document.getElementById('mark-attention'); if (button) button.disabled = false; }, 0);
+      if (row) setTimeout(() => {
+        const button = document.getElementById('mark-attention');
+        const current = (state.conversations || []).find(item => item.phone === selectedPhone) || {};
+        if (button) {
+          button.disabled = false;
+          button.textContent = Number(current.attention_at || 0) ? '✓ Resolver' : '🟠 Revisar';
+        }
+      }, 0);
     });
     document.getElementById('mark-attention')?.addEventListener('click', async () => {
       if (!selectedPhone) return;
