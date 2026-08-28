@@ -414,7 +414,11 @@
     loadReviews = oneAtATime(loadReviews);
     loadReceived = oneAtATime(loadReceived);
     loadActivity = oneAtATime(loadActivity);
-    loadConversation = oneAtATime(loadConversation);
+    // A conversa usa controle de geração próprio: cada clique incrementa
+    // conversationLoadGeneration e invalida a resposta anterior. Não a
+    // envolva em oneAtATime, pois esse bloqueio simplesmente descartava o
+    // clique seguinte enquanto a conversa anterior carregava — e o painel
+    // acabava abrindo novamente a conversa antiga.
 
     refreshActiveView = async () => {
       if (document.hidden) return;
