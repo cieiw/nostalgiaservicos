@@ -225,7 +225,7 @@
     <aside class="side"><div class="brand"><img src="../assets/nostalgia-logo.png" alt=""><div>Nostalgia<br><span>Administração</span></div></div><nav class="nav"><div class="nav-title">Painel</div><button class="active" data-view="dashboard">▣ Pedidos</button><button data-view="conversations">◉ Conversas</button><button data-view="reviews">▧ Revisão</button></nav><div class="bottom"><button id="logout" class="button secondary">Sair</button></div></aside>
     <section class="content"><header class="top"><div><h1 id="title">Pedidos</h1><p id="subtitle">Pedidos recentes recebidos pelo atendimento.</p></div><button id="install-app" type="button">Instalar</button><div id="connection" class="online">● Atualizando</div></header>
       <section id="dashboard" class="view active"><section class="box"><h2>Pedidos recentes</h2><div id="recent-orders" class="list"></div></section></section>
-      <section id="conversations" class="view"><div class="grid"><section class="box"><h2>Conversas</h2><div id="conversation-list" class="conversation-list"></div></section><section class="box chat"><div id="chat-title" class="chat-header"><button id="chat-back" type="button" class="chat-action">← Voltar</button><span id="chat-name">Selecione uma conversa</span><button id="rename-client" type="button" class="chat-action" disabled>Nome</button><button id="mark-attention" type="button" class="chat-action" disabled>🟠 Revisar</button><button id="mark-read" type="button" class="chat-action" disabled>✅ Lida</button></div><div id="messages" class="messages"><div class="empty">As mensagens do cliente e do robô aparecerão aqui.</div></div><form id="compose" class="compose"><textarea id="message-text" placeholder="Escreva uma mensagem" disabled></textarea><button id="send-message" class="button" disabled>Enviar</button></form></section></div></section>
+      <section id="conversations" class="view"><div class="grid"><section class="box"><h2>Conversas</h2><div id="conversation-list" class="conversation-list"></div></section><section class="box chat"><div id="chat-title" class="chat-header"><button id="chat-back" type="button" class="chat-action">← Voltar</button><span id="chat-name">Selecione uma conversa</span><button id="rename-client" type="button" class="chat-action" disabled>Nome</button><button id="mark-attention" type="button" class="chat-action" disabled>🟠 Revisar</button><button id="manage-order" type="button" class="chat-action" disabled>Pedido</button><button id="mark-read" type="button" class="chat-action" disabled>✅ Lida</button></div><div id="messages" class="messages"><div class="empty">As mensagens do cliente e do robô aparecerão aqui.</div></div><form id="compose" class="compose"><textarea id="message-text" placeholder="Escreva uma mensagem" disabled></textarea><button id="send-message" class="button" disabled>Enviar</button></form></section></div></section>
       <section id="reviews" class="view"><div class="toolbar"><button id="refresh-reviews" class="button secondary">Atualizar revisão</button><button id="finish-reviews" class="button">Finalizar escolhas</button></div><div id="review-list" class="reviews"><div class="empty">Nenhuma revisão pendente.</div></div></section>
     </section>
   </main>
@@ -909,6 +909,35 @@
       window.reviewSelectionState?.set(String(input.closest('[data-review]')?.dataset.review || ''), Number(input.value));
       showSelectedChoice(input);
     }
+    });
+  })();
+</script>
+<script>
+  (() => {
+    const managerButton = document.getElementById('manage-order');
+    const escManager = value => String(value ?? '').replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+    const renderManager = data => {
+      const host = document.getElementById('messages');
+      const orders = data.orders || [];
+      if (!orders.length) { host.innerHTML = '<div class="empty">Este cliente não tem pedido aberto para gerenciar.</div>'; return; }
+      host.innerHTML = `<section class="box" style="margin:10px;padding:14px"><h3 style="margin-top:0">Gerenciar pedido</h3><p class="muted">Todas as fotos começam incluídas. Desmarque apenas as enviadas por engano; o PIX e a entrega final usarão esta mesma seleção.</p>${orders.map(order => `<form class="order-usage" data-order="${order.id}"><h4>Pedido #${order.id}</h4><div class="photos">${order.photos.map(photo => `<label class="photo-card" style="display:block;padding:8px;border:1px solid #303946;border-radius:10px;margin:8px 0"><input type="checkbox" value="${photo.local_photo_id}" ${photo.included ? 'checked' : ''}><b> Foto ${escManager(photo.source_name)}</b>${photo.media_id ? `<img loading="lazy" style="display:block;max-height:150px;max-width:100%;object-fit:contain;margin-top:7px" src="${API}/admin-api/media/${photo.media_id}" alt="Foto original">` : '<small>Imagem será sincronizada quando o PC estiver conectado.</small>'}${photo.review_id && photo.selected ? `<img loading="lazy" style="display:block;max-height:150px;max-width:100%;object-fit:contain;margin-top:7px" src="${API}/admin-api/reviews/${encodeURIComponent(photo.review_id)}/candidate/${photo.selected}" alt="Opção aprovada">` : ''}</label>`).join('')}</div><button class="button" type="submit">Salvar fotos do pedido</button></form>`).join('')}</section>`;
+      host.querySelectorAll('.order-usage').forEach(form => form.addEventListener('submit', async event => {
+        event.preventDefault();
+        const photo_ids = [...form.querySelectorAll('input:checked')].map(input => Number(input.value));
+        const button = form.querySelector('button'); button.disabled = true;
+        try { await request(`/admin-api/orders/${form.dataset.order}/photo-usage`, {method:'POST',body:JSON.stringify({photo_ids})}); button.textContent = 'Salvo — aplicando no computador…'; }
+        catch(error) { alert(error.message); button.disabled = false; }
+      }));
+    };
+    document.addEventListener('click', event => {
+      if (event.target.closest('[data-phone]')) setTimeout(() => { managerButton.disabled = !selectedPhone; }, 0);
+    });
+    managerButton?.addEventListener('click', async () => {
+      if (!selectedPhone) return;
+      managerButton.disabled = true;
+      try { renderManager(await request(`/admin-api/conversations/${encodeURIComponent(selectedPhone)}/order-management`)); }
+      catch(error) { alert(error.message); }
+      finally { managerButton.disabled = false; }
     });
   })();
 </script>
