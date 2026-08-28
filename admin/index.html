@@ -273,7 +273,8 @@
     async function imageUrl(path){
       if(imageObjectUrlCache.has(path))return imageObjectUrlCache.get(path);
       if(imageObjectUrlInflight.has(path))return imageObjectUrlInflight.get(path);
-      const pending=fetch(API+path,{headers:{authorization:'Bearer '+token}}).then(async r=>{if(!r.ok)throw new Error('imagem indisponível');const url=URL.createObjectURL(await r.blob());imageObjectUrlCache.set(path,url);return url}).finally(()=>imageObjectUrlInflight.delete(path));
+      const controller=new AbortController(),timeout=setTimeout(()=>controller.abort(),20000);
+      const pending=fetch(API+path,{headers:{authorization:'Bearer '+token},signal:controller.signal}).then(async r=>{if(!r.ok)throw new Error('imagem indisponível');const url=URL.createObjectURL(await r.blob());imageObjectUrlCache.set(path,url);return url}).finally(()=>{clearTimeout(timeout);imageObjectUrlInflight.delete(path)});
       imageObjectUrlInflight.set(path,pending);return pending;
     }
     function hydrateImages(root){
