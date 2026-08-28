@@ -994,7 +994,7 @@
       if (!original || original.querySelector('[data-rotate-original]')) return;
       const button = document.createElement('button');
       button.type = 'button'; button.className = 'button secondary';
-      button.dataset.rotateOriginal = '1'; button.textContent = '↻ Girar foto original';
+      button.dataset.rotateOriginal = '1'; button.title = 'O giro só será enviado ao finalizar a revisão'; button.textContent = '↻ Girar foto original';
       original.append(button);
     });
     document.addEventListener('click', event => {
