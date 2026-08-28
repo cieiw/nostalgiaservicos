@@ -928,6 +928,16 @@
         try { await request(`/admin-api/orders/${form.dataset.order}/photo-usage`, {method:'POST',body:JSON.stringify({photo_ids})}); button.textContent = 'Salvo — aplicando no computador…'; }
         catch(error) { alert(error.message); button.disabled = false; }
       }));
+      host.querySelectorAll('.order-usage').forEach(form => {
+        const order = orders.find(item => String(item.id) === String(form.dataset.order));
+        (order?.results || []).forEach(result => {
+          const photo = [...form.querySelectorAll('.photo-card')].find(card => card.textContent.includes(result.source_name));
+          if (!photo) return;
+          const button = document.createElement('button'); button.type='button'; button.className='button secondary'; button.textContent='Refazer esta foto'; button.style.marginTop='6px';
+          button.onclick = async () => { button.disabled=true; button.textContent='Enviando para refazer…'; try { await request(`/admin-api/orders/${order.id}/manual-redo`, {method:'POST',body:JSON.stringify({delivery_result_id:result.delivery_result_id})}); button.textContent='Refação enviada ao PC'; } catch(error) { button.disabled=false; button.textContent='Refazer esta foto'; alert(error.message); } };
+          photo.append(button);
+        });
+      });
     };
     document.addEventListener('click', event => {
       if (event.target.closest('[data-phone]')) setTimeout(() => { managerButton.disabled = !selectedPhone; }, 0);
