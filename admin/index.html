@@ -973,7 +973,8 @@
         const rotation = (Number(card.dataset.previewRotation || 0) + 90) % 360;
         card.dataset.previewRotation = rotation;
         if (image) image.style.transform = `rotate(${rotation}deg)`;
-        button.textContent = 'Giro enviado · aguardando PC';
+        button.disabled = false;
+        button.textContent = '↻ Girar novamente';
       } catch(error) { button.disabled = false; button.textContent = '↻ Girar foto original'; alert(error.message); }
     });
     const root = document.getElementById('review-list');
