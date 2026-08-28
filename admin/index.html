@@ -974,6 +974,10 @@
   (() => {
     const reviewRotationState = window.reviewRotationState || new Map();
     window.reviewRotationState = reviewRotationState;
+    const clearStaleRotationState = () => {
+      const active = new Set((reviews || []).map(item => String(item.item_id)));
+      reviewRotationState.forEach((_value, id) => { if (!active.has(String(id))) reviewRotationState.delete(id); });
+    };
     const syncRotationState = () => document.querySelectorAll('[data-review]').forEach(card => {
       const remote = (reviews || []).find(item => String(item.item_id) === String(card.dataset.review));
       if (!remote) return;
@@ -1011,7 +1015,8 @@
       button.textContent = '↻ Girar novamente';
     });
     const root = document.getElementById('review-list');
-    if (root) new MutationObserver(() => { syncRotationState(); addRotateButtons(); }).observe(root,{childList:true,subtree:true});
+    if (root) new MutationObserver(() => { clearStaleRotationState(); syncRotationState(); addRotateButtons(); }).observe(root,{childList:true,subtree:true});
+    clearStaleRotationState();
     syncRotationState();
     addRotateButtons();
   })();
