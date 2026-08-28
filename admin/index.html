@@ -941,5 +941,35 @@
     });
   })();
 </script>
+<script>
+  (() => {
+    const addRotateButtons = () => document.querySelectorAll('[data-review]').forEach(card => {
+      const original = card.querySelector('.review-original');
+      if (!original || original.querySelector('[data-rotate-original]')) return;
+      const button = document.createElement('button');
+      button.type = 'button'; button.className = 'button secondary';
+      button.dataset.rotateOriginal = '1'; button.textContent = '↻ Girar foto original';
+      original.append(button);
+    });
+    document.addEventListener('click', async event => {
+      const button = event.target.closest('[data-rotate-original]');
+      if (!button) return;
+      const card = button.closest('[data-review]');
+      if (!card) return;
+      button.disabled = true; button.textContent = 'Girando no computador…';
+      try {
+        await request('/admin-api/reviews/rotate', { method:'POST', body:JSON.stringify({id:card.dataset.review}) });
+        const image = card.querySelector('.review-original img');
+        const rotation = (Number(card.dataset.previewRotation || 0) + 90) % 360;
+        card.dataset.previewRotation = rotation;
+        if (image) image.style.transform = `rotate(${rotation}deg)`;
+        button.textContent = 'Giro enviado · aguardando PC';
+      } catch(error) { button.disabled = false; button.textContent = '↻ Girar foto original'; alert(error.message); }
+    });
+    const root = document.getElementById('review-list');
+    if (root) new MutationObserver(addRotateButtons).observe(root,{childList:true,subtree:true});
+    addRotateButtons();
+  })();
+</script>
 </body>
 </html>
