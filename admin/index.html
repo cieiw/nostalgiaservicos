@@ -1043,11 +1043,10 @@
       head.querySelector('h2').textContent = `Pedido #${order.id || id}`;
       head.querySelector('.sub').textContent = `${formatPhone(order.phone) || order.phone || 'Cliente'} · ${photos.length} foto(s) · ${statusLabel(order.status) || 'status sincronizado'}`;
       actions.innerHTML = `<button type="button" class="button secondary" data-order-action="pause" data-order-id="${Number(order.id || id)}">Pausar / retomar</button><button type="button" class="button danger" data-order-action="restart" data-order-id="${Number(order.id || id)}">Reiniciar pedido</button><span class="sub" data-order-status>O pedido pode ser controlado pelo computador conectado.</span>`;
-      grid.innerHTML = photos.length ? photos.map(photo => `<figure class="order-photo"><${photo.media_id ? `img data-image="/admin-api/media/${Number(photo.media_id)}" loading="lazy" alt="Foto do pedido"` : `div class="sub"`} >${photo.media_id ? '' : 'Imagem aguardando sincronização'}</${photo.media_id ? 'img' : 'div'}><figcaption>${escOrder(photo.source_name)}<br><span class="${photo.included ? 'included' : 'excluded'}">${photo.included ? 'Incluída no pedido' : 'Fora do pedido'}</span></figcaption></figure>`).join('') : '<div class="empty">Nenhuma foto sincronizada para este pedido.</div>';
-      if (photos.length) grid.innerHTML = photos.map(photo => {
+      grid.innerHTML = photos.length ? photos.map(photo => {
         const media = photo.media_id ? `<img data-image="/admin-api/media/${Number(photo.media_id)}" loading="lazy" alt="Foto do pedido">` : `<div class="sub">Imagem aguardando sincronização</div>`;
         return `<figure class="order-photo">${media}<figcaption>${escOrder(photo.source_name)}<br><span class="${photo.included ? 'included' : 'excluded'}">${photo.included ? 'Incluída no pedido' : 'Fora do pedido'}</span></figcaption></figure>`;
-      }).join('');
+      }).join('') : '<div class="empty">Nenhuma foto sincronizada para este pedido.</div>';
       if (typeof hydrateImages === 'function') hydrateImages(grid);
     };
     const open = async id => {
