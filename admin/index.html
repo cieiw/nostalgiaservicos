@@ -1007,7 +1007,7 @@
       card.dataset.rotationDegrees = String((rotation + 360) % 360);
       card.dataset.previewRotation = card.dataset.rotationDegrees;
       const image = card.querySelector('.review-original img');
-      if (image && rotation) image.style.transform = `rotate(${rotation}deg)`;
+      if (image) image.style.transform = rotation ? `rotate(${rotation}deg)` : 'none';
     });
     const addRotateButtons = () => document.querySelectorAll('[data-review]').forEach(card => {
       const original = card.querySelector('.review-original');
@@ -1031,7 +1031,7 @@
       reviewRotationState.set(String(card.dataset.review), rotation);
       card.dataset.previewRotation = String(rotation);
       card.dataset.rotationDegrees = String(rotation);
-      if (image) image.style.transform = `rotate(${rotation}deg)`;
+      if (image) image.style.transform = rotation ? `rotate(${rotation}deg)` : 'none';
       button.textContent = '↻ Girar novamente';
     });
     const root = document.getElementById('review-list');
