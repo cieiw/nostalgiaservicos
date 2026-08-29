@@ -329,6 +329,19 @@
       const eagerReview=root.id==='review-list';
       images.forEach(image=>{image.loading='lazy';if(eagerReview){imageObserver?.unobserve?.(image);load(image);return}if(firstReview&&image.closest('[data-review]')===firstReview){load(image);return}if(imageObserver)imageObserver.observe(image);else load(image)});
     }
+    // Fotos de um pedido são poucas e são justamente o motivo de abrir este
+    // detalhe. Portanto não as coloque na fila do lazy-load: inicia todas em
+    // paralelo, sem esperar o observador perceber o modal ou a área rolável.
+    async function hydrateOrderImages(root){
+      const images=[...root.querySelectorAll('[data-media],[data-outbound-media],[data-image]')];
+      await Promise.all(images.map(async image=>{
+        const path=image.dataset.media||image.dataset.outboundMedia||image.dataset.image;
+        if(!path||image.dataset.orderLoaded)return;
+        image.dataset.orderLoaded='loading';
+        try{image.src=await imageUrl(path);image.dataset.orderLoaded='1';enableImagePreview(image)}
+        catch(_){image.dataset.orderLoaded='error';image.alt='Imagem indisponível';image.classList.add('image-unavailable')}
+      }));
+    }
     function groupReviewCards(){
       const root=$('#review-list');
       if(!root)return;
@@ -969,7 +982,7 @@
         try { await request(`/admin-api/orders/${form.dataset.order}/photo-usage`, {method:'POST',body:JSON.stringify({photo_ids})}); button.textContent = 'Salvo — aplicando no computador…'; }
         catch(error) { alert(error.message); button.disabled = false; }
       }));
-      if (typeof hydrateImages === 'function') hydrateImages(host);
+      if (typeof hydrateOrderImages === 'function') hydrateOrderImages(host);
       host.querySelectorAll('[data-manual-redo]').forEach(button => button.onclick = async () => {
         const card = button.closest('.manual-redo-card');
         const edit_prompt = card?.querySelector('[data-redo-prompt]')?.value.trim() || '';
@@ -1067,7 +1080,7 @@
         const media = photo.media_id ? `<img data-image="/admin-api/media/${Number(photo.media_id)}" loading="lazy" alt="Foto do pedido">` : `<div class="sub">Imagem aguardando sincronização</div>`;
         return `<figure class="order-photo">${media}<figcaption>${escOrder(photo.source_name)}<br><span class="${photo.included ? 'included' : 'excluded'}">${photo.included ? 'Incluída no pedido' : 'Fora do pedido'}</span></figcaption></figure>`;
       }).join('') : '<div class="empty">Nenhuma foto sincronizada para este pedido.</div>';
-      if (typeof hydrateImages === 'function') hydrateImages(grid);
+      if (typeof hydrateOrderImages === 'function') hydrateOrderImages(grid);
     };
     const open = async id => {
       id = Number(id || 0); if (!id) return;
