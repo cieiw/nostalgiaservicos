@@ -961,7 +961,7 @@
       const host = document.getElementById('messages');
       const orders = data.orders || [];
       if (!orders.length) { host.innerHTML = '<div class="empty">Este cliente não tem pedido aberto para gerenciar.</div>'; return; }
-      host.innerHTML = `<section class="box" style="margin:10px;padding:14px"><h3 style="margin-top:0">Gerenciar pedido</h3><p class="muted">Todas as fotos começam incluídas. Desmarque apenas as enviadas por engano; o PIX e a entrega final usarão esta mesma seleção.</p>${orders.map(order => `<form class="order-usage" data-order="${order.id}"><h4>Pedido #${order.id}</h4><div class="photos">${order.photos.map(photo => `<label class="photo-card" style="display:block;padding:8px;border:1px solid #303946;border-radius:10px;margin:8px 0"><input type="checkbox" value="${photo.local_photo_id}" ${photo.included ? 'checked' : ''}><b> Foto ${escManager(photo.source_name)}</b>${photo.media_id ? `<img loading="lazy" style="display:block;max-height:150px;max-width:100%;object-fit:contain;margin-top:7px" src="${API}/admin-api/media/${photo.media_id}" alt="Foto original">` : '<small>Imagem será sincronizada quando o PC estiver conectado.</small>'}${photo.review_id && photo.selected ? `<img loading="lazy" style="display:block;max-height:150px;max-width:100%;object-fit:contain;margin-top:7px" src="${API}/admin-api/reviews/${encodeURIComponent(photo.review_id)}/candidate/${photo.selected}" alt="Opção aprovada">` : ''}</label>`).join('')}</div><button class="button" type="submit">Salvar fotos do pedido</button></form>`).join('')}</section>`;
+      host.innerHTML = `<section class="box" style="margin:10px;padding:14px"><h3 style="margin-top:0">Gerenciar pedido</h3><p class="muted">A foto original e a versão aprovada ficam visíveis aqui. Para refazer: escreva uma edição para partir da foto aprovada; deixe em branco para regenerar a partir da original.</p>${orders.map(order => `<form class="order-usage" data-order="${order.id}"><h4>Pedido #${order.id}</h4><div class="photos">${order.photos.map(photo => `<label class="photo-card" style="display:block;padding:8px;border:1px solid #303946;border-radius:10px;margin:8px 0"><input type="checkbox" value="${photo.local_photo_id}" ${photo.included ? 'checked' : ''}><b> Original · ${escManager(photo.source_name)}</b>${photo.media_id ? `<img data-image="/admin-api/media/${photo.media_id}" alt="Foto original">` : '<small>Imagem será sincronizada quando o PC estiver conectado.</small>'}</label>`).join('')}</div><button class="button" type="submit">Salvar fotos do pedido</button></form><section class="manual-redo-list"><h4>Fotos aprovadas — editar ou refazer</h4>${(order.results||[]).map(result => `<article class="photo-card manual-redo-card"><b>${escManager(result.label||'Foto aprovada')}</b>${result.media_url ? `<img data-image="${escManager(result.media_url)}" alt="Foto aprovada">` : ''}<textarea data-redo-prompt placeholder="Descreva a edição (opcional)"></textarea><button class="button secondary" type="button" data-manual-redo data-order="${order.id}" data-result="${result.delivery_result_id}">Refazer esta foto</button><small>Com texto: edita a foto aprovada. Sem texto: refaz pela original.</small></article>`).join('') || '<p class="sub">Ainda não há fotos aprovadas neste pedido.</p>'}</section>`).join('')}</section>`;
       host.querySelectorAll('.order-usage').forEach(form => form.addEventListener('submit', async event => {
         event.preventDefault();
         const photo_ids = [...form.querySelectorAll('input:checked')].map(input => Number(input.value));
@@ -969,15 +969,13 @@
         try { await request(`/admin-api/orders/${form.dataset.order}/photo-usage`, {method:'POST',body:JSON.stringify({photo_ids})}); button.textContent = 'Salvo — aplicando no computador…'; }
         catch(error) { alert(error.message); button.disabled = false; }
       }));
-      host.querySelectorAll('.order-usage').forEach(form => {
-        const order = orders.find(item => String(item.id) === String(form.dataset.order));
-        (order?.results || []).forEach(result => {
-          const photo = [...form.querySelectorAll('.photo-card')].find(card => card.textContent.includes(result.source_name));
-          if (!photo) return;
-          const button = document.createElement('button'); button.type='button'; button.className='button secondary'; button.textContent='Refazer esta foto'; button.style.marginTop='6px';
-          button.onclick = async () => { button.disabled=true; button.textContent='Enviando para refazer…'; try { await request(`/admin-api/orders/${order.id}/manual-redo`, {method:'POST',body:JSON.stringify({delivery_result_id:result.delivery_result_id})}); button.textContent='Refação enviada ao PC'; } catch(error) { button.disabled=false; button.textContent='Refazer esta foto'; alert(error.message); } };
-          photo.append(button);
-        });
+      if (typeof hydrateImages === 'function') hydrateImages(host);
+      host.querySelectorAll('[data-manual-redo]').forEach(button => button.onclick = async () => {
+        const card = button.closest('.manual-redo-card');
+        const edit_prompt = card?.querySelector('[data-redo-prompt]')?.value.trim() || '';
+        button.disabled=true; button.textContent=edit_prompt ? 'Enviando edição…' : 'Enviando para refazer…';
+        try { await request(`/admin-api/orders/${button.dataset.order}/manual-redo`, {method:'POST',body:JSON.stringify({delivery_result_id:Number(button.dataset.result),edit_prompt})}); button.textContent='Enviado ao PC — voltará para revisão'; }
+        catch(error) { button.disabled=false; button.textContent='Refazer esta foto'; alert(error.message); }
       });
     };
     document.addEventListener('click', event => {
