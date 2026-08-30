@@ -74,7 +74,9 @@
 </style>
 <style>
   .conversation-top { display:flex; align-items:center; gap:10px; }
-  .photo-unread-dot { background:var(--blue); box-shadow:0 0 0 3px #79a9ff2b; }
+  .order-dot { background:#f08a24; box-shadow:0 0 0 3px #f08a2430; }
+  .feedback-dot { background:#ed5c63; box-shadow:0 0 0 3px #ed5c6330; }
+  .manual-dot { background:#f5f6f8; box-shadow:0 0 0 3px #f5f6f82b; }
   .conversation-phone { font-weight:700; letter-spacing:.01em; }
   .conversation-time { margin-left:auto; flex:none; color:#c0c8d6; font-size:12px; font-variant-numeric:tabular-nums; white-space:nowrap; }
   .conversation-preview { display:block; color:#aeb7c6; font-size:12px; margin-top:5px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
@@ -108,7 +110,7 @@
     .toolbar { position:sticky; z-index:12; top:55px; margin:0 -2px 10px; padding:5px 2px; background:#0b0d11eF; }
     .toolbar .button { flex:1; min-height:40px; padding:9px 7px; }
     .list, .conversation-list { max-height:none; }
-    .attention-dot { background:#f08a24; box-shadow:0 0 0 3px #f08a2430; }
+    .order-dot { background:#f08a24; box-shadow:0 0 0 3px #f08a2430; }
     #conversations .grid { display:block; }
     #conversations .grid > .box:first-child { max-height:calc(100dvh - 176px); overflow:auto; }
     #conversations .chat { display:none; height:calc(100dvh - 150px); min-height:0; position:fixed; z-index:25; inset:0 0 72px; border-radius:0; border:0; background:var(--bg); }
@@ -425,8 +427,25 @@
       if (!select?.value || !card?.dataset.review) return;
       requestedVersions.add(`/admin-api/reviews/${encodeURIComponent(card.dataset.review)}/version/${encodeURIComponent(select.value)}`);
     }, true);
-    // Pendência laranja é uma decisão operacional: pode ser criada ou
-    // resolvida sem alterar o pedido, a revisão ou as mensagens.
+    // Uma única bolinha, com prioridade branca, vermelha, laranja e amarela.
+    // O Worker é a fonte comum para painel e programa.
+    window.render = function(){
+      const orders=state.orders||[],cs=state.conversations||[];
+      $('#recent-orders').innerHTML=orders.length?orders.map(orderRow).join(''):'<div class="empty">Nenhum pedido ainda.</div>';
+      const markerFor=c=>{const reason=String(c.attention_reason||'').trim().toLowerCase();if(Number(c.attention_at||0))return ['ver depois','manual','revisão manual','revisao manual'].includes(reason)?'manual':'feedback';if(c.workflow_marker==='order')return 'order';return c.unread?'message':''};
+      const dotFor=marker=>marker==='manual'?'<i class="unread-dot manual-dot" aria-label="Ver depois"></i>':marker==='feedback'?'<i class="unread-dot feedback-dot" aria-label="Avaliação respondida"></i>':marker==='order'?'<i class="unread-dot order-dot" aria-label="Pedido iniciado"></i>':marker==='message'?'<i class="unread-dot" aria-label="Nova mensagem"></i>':'';
+      $('#conversation-list').innerHTML=cs.length?cs.map(c=>{const photos=Number(c.open_photos||0),detail=photos?`${photos} foto(s) no pedido`:'';const preview=String(c.last_message||'Sem mensagens');const prefix=c.last_direction==='outgoing'?'Robô: ':'';return `<button class="conversation" data-phone="${esc(c.phone)}"><span class="conversation-top"><span class="conversation-phone">${dotFor(markerFor(c))}${esc(c.name||formatPhone(c.phone))}</span><time class="conversation-time">${esc(conversationTime(c.last_at))}</time></span><span class="conversation-preview">${esc(prefix+preview)}</span>${detail?`<span class="conversation-detail">${esc(detail)}</span>`:''}</button>`}).join(''):'<div class="empty">Nenhuma conversa disponível.</div>';
+      document.querySelectorAll('[data-phone]').forEach(b=>b.onclick=()=>loadConversation(b.dataset.phone));
+    };
+    document.addEventListener('click', event => {
+      const row=event.target.closest('[data-phone]');
+      if(!row)return;
+      const current=(state.conversations||[]).find(item=>item.phone===row.dataset.phone);
+      if(!current||!Number(current.attention_at||0))return;
+      current.attention_at=0;current.attention_reason='';render();
+      request('/admin-api/conversations/'+encodeURIComponent(row.dataset.phone)+'/read',{method:'POST'}).then(load).catch(()=>{});
+    });
+    // Marcador branco é explícito e pode ser desfeito pelo mesmo botão.
     document.addEventListener('click', event => {
       const row = event.target.closest('[data-phone]');
       if (row) setTimeout(() => {
@@ -434,7 +453,7 @@
         const current = (state.conversations || []).find(item => item.phone === selectedPhone) || {};
         if (button) {
           button.disabled = false;
-          button.textContent = Number(current.attention_at || 0) ? '✓ Resolver' : '🟠 Revisar';
+          button.textContent = Number(current.attention_at || 0) ? '✓ Resolvido' : '⚪ Ver depois';
         }
       }, 0);
     });
@@ -443,11 +462,11 @@
       const current = (state.conversations || []).find(item => item.phone === selectedPhone) || {};
       const active = !Number(current.attention_at || 0);
       try {
-        await request('/admin-api/conversations/' + encodeURIComponent(selectedPhone) + '/attention', { method:'POST', body:JSON.stringify({ active, reason: active ? 'revisão manual' : '' }) });
+        await request('/admin-api/conversations/' + encodeURIComponent(selectedPhone) + '/attention', { method:'POST', body:JSON.stringify({ active, reason: active ? 'ver depois' : '' }) });
         current.attention_at = active ? Date.now() : 0;
-        current.attention_reason = active ? 'revisão manual' : '';
+        current.attention_reason = active ? 'ver depois' : '';
         const button = document.getElementById('mark-attention');
-        if (button) button.textContent = active ? '✓ Resolver' : '🟠 Revisar';
+        if (button) button.textContent = active ? '✓ Resolvido' : '⚪ Ver depois';
         render();
       } catch (error) { alert(error.message); }
     });
