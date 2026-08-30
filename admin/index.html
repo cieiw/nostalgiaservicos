@@ -291,7 +291,7 @@
       $('#login').classList.add('hide');$('#app').classList.remove('hide');
       refreshActiveView();
       if(refreshTimer) clearInterval(refreshTimer);
-      refreshTimer=setInterval(refreshActiveView,7000);
+      refreshTimer=setInterval(refreshActiveView,2500);
     }
     document.addEventListener('visibilitychange',()=>{if(!document.hidden&&token)refreshActiveView()});
     function logout(){localStorage.removeItem(key);token='';$('#app').classList.add('hide');$('#login').classList.remove('hide')}
