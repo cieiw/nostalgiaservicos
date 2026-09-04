@@ -1095,10 +1095,10 @@
       const order = data.order || {}, photos = order.photos || [], head = modal.querySelector('.order-modal-head'), actions = modal.querySelector('.order-detail-actions'), grid = modal.querySelector('.order-photo-grid');
       head.querySelector('h2').textContent = `Pedido #${order.id || id}`;
       head.querySelector('.sub').textContent = `${formatPhone(order.phone) || order.phone || 'Cliente'} · ${photos.length} foto(s) · ${statusLabel(order.status) || 'status sincronizado'}`;
-      actions.innerHTML = `<button type="button" class="button secondary" data-order-action="pause" data-order-id="${Number(order.id || id)}">Pausar / retomar</button><button type="button" class="button danger" data-order-action="restart" data-order-id="${Number(order.id || id)}">Reiniciar pedido</button><span class="sub" data-order-status>O pedido pode ser controlado pelo computador conectado.</span>`;
+      actions.innerHTML = `<button type="button" class="button secondary" data-order-action="pause" data-order-id="${Number(order.id || id)}">Pausar / retomar</button><button type="button" class="button danger" data-order-action="restart" data-order-id="${Number(order.id || id)}">Reiniciar pedido</button><button type="button" class="button secondary" data-order-manage="save">Salvar fotos marcadas</button><button type="button" class="button secondary" data-order-manage="reprocess">Refazer fotos marcadas</button><span class="sub" data-order-status>Marque as fotos que devem fazer parte do pedido.</span>`;
       grid.innerHTML = photos.length ? photos.map(photo => {
         const media = photo.original_url ? `<img data-image="${escOrder(photo.original_url)}" alt="Foto do pedido">` : `<div class="sub">Imagem original indisponível</div>`;
-        return `<figure class="order-photo">${media}<figcaption>${escOrder(photo.source_name)}<br><span class="${photo.included ? 'included' : 'excluded'}">${photo.included ? 'Incluída no pedido' : 'Fora do pedido'}</span></figcaption></figure>`;
+        return `<figure class="order-photo">${media}<figcaption><label><input type="checkbox" data-order-photo value="${Number(photo.local_photo_id)}" ${photo.included ? 'checked' : ''}> ${escOrder(photo.source_name)}</label><br><span class="${photo.included ? 'included' : 'excluded'}">${photo.included ? 'Incluída no pedido' : 'Fora do pedido'}</span></figcaption></figure>`;
       }).join('') : '<div class="empty">Nenhuma foto sincronizada para este pedido.</div>';
       if (typeof hydrateOrderImages === 'function') hydrateOrderImages(grid);
     };
@@ -1116,6 +1116,24 @@
       action.disabled = true; const old = action.textContent; action.textContent = action.dataset.orderAction === 'restart' ? 'Reiniciando…' : 'Aplicando…';
       try { await request(`/admin-api/orders/${currentOrderId}/${action.dataset.orderAction}`, { method:'POST', body:'{}' }); action.textContent = 'Comando enviado ao PC'; modal.querySelector('[data-order-status]').textContent = 'Aguardando confirmação do computador…'; }
       catch (error) { action.disabled = false; action.textContent = old; alert(error.message); }
+    });
+    document.addEventListener('click', async event => {
+      const button = event.target.closest('[data-order-manage]');
+      if (!button || !modal || !currentOrderId) return;
+      const photo_ids = [...modal.querySelectorAll('[data-order-photo]:checked')].map(input => Number(input.value)).filter(Number.isInteger);
+      if (!photo_ids.length) return alert('Marque ao menos uma foto para o pedido.');
+      const mode = button.dataset.orderManage;
+      if (mode === 'reprocess' && !confirm('Refazer somente as fotos marcadas desde as originais? Elas voltarão para a Revisão.')) return;
+      button.disabled = true;
+      const old = button.textContent;
+      button.textContent = mode === 'reprocess' ? 'Enviando para revisão…' : 'Salvando…';
+      try {
+        await request(`/admin-api/orders/${currentOrderId}/photo-usage`, {method:'POST',body:JSON.stringify({photo_ids})});
+        if (mode === 'reprocess') await request(`/admin-api/orders/${currentOrderId}/return-review`, {method:'POST',body:'{}'});
+        button.textContent = mode === 'reprocess' ? 'Na fila de revisão' : 'Fotos salvas';
+        modal.querySelector('[data-order-status]').textContent = mode === 'reprocess' ? 'O computador irá gerar novas opções.' : 'Composição do pedido atualizada.';
+        load();
+      } catch (error) { button.disabled = false; button.textContent = old; alert(error.message); }
     });
     document.addEventListener('keydown', event => { if (event.key === 'Escape' && modal) close(); });
   })();
